@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+    <title>ShowOff Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--vscode-font-family);
+            background-color: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            border-bottom: 1px solid var(--vscode-panel-border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--vscode-titleBar-activeForeground);
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: var(--vscode-descriptionForeground);
+            font-size: 0.9em;
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .status-card {
+            background-color: var(--vscode-editor-inactiveSelectionBackground);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 6px;
+            padding: 15px;
+        }
+        
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--vscode-foreground);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+        }
+        
+        .status-icon {
+            color: var(--vscode-charts-green);
+            font-weight: bold;
+        }
+        
+        .canvas-area {
+            background-color: var(--vscode-input-background);
+            border: 2px dashed var(--vscode-panel-border);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--vscode-panel-border);
+            font-size: 0.8em;
+            color: var(--vscode-descriptionForeground);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 ShowOff Visual Canvas</h1>
+        <div class="subtitle">Interactive drawing space for AI collaboration</div>
+    </div>
+    
+    <div class="content">
+        <div class="status-card">
+            <div class="status-title">Extension Status</div>
+            <div class="status-item">
+                <span class="status-icon">✅</span>
+                <span>Extension loaded successfully</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">✅</span>
+                <span>Webview panel active</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">⏳</span>
+                <span>Canvas drawing capabilities - coming in Milestone 3</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">⏳</span>
+                <span>AI tool integration - coming in Milestone 4</span>
+            </div>
+        </div>
+        
+        <div class="canvas-area">
+            Canvas area will appear here in the next milestone<br>
+            This space is reserved for AI-generated drawings and visualizations
+        </div>
+    </div>
+    
+    <div class="footer">
+        ShowOff Extension v0.0.1 | Milestone 2 Complete
+    </div>
+    
+    <script>
+        console.log('ShowOff webview loaded successfully!');
+        
+        // This will be used for communication with the extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            console.log('Received message from extension:', message);
+        });
+        
+        // Send ready signal to extension
+        if (typeof acquireVsCodeApi !== 'undefined') {
+            const vscode = acquireVsCodeApi();
+            vscode.postMessage({ command: 'webview-ready' });
+        }
+    </script>
+</body>
+</html>

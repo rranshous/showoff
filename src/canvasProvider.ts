@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
 
@@ -27,33 +29,54 @@ export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
         };
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+
+        // Listen for messages from the webview
+        webviewView.webview.onDidReceiveMessage(
+            message => {
+                switch (message.command) {
+                    case 'webview-ready':
+                        console.log('ShowOff webview is ready!');
+                        return;
+                }
+            },
+            undefined,
+            []
+        );
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>ShowOff Canvas</title>
-				<style>
-					body {
-						margin: 0;
-						padding: 20px;
-						font-family: var(--vscode-font-family);
-						background-color: var(--vscode-editor-background);
-						color: var(--vscode-editor-foreground);
-					}
-					h1 {
-						margin-top: 0;
-					}
-				</style>
-			</head>
-			<body>
-				<h1>ShowOff Canvas</h1>
-				<p>Welcome to the ShowOff visual canvas! This is where Copilot will be able to draw and collaborate visually.</p>
-				<p>Status: Ready for milestone 1 ✅</p>
-			</body>
-			</html>`;
+        // Get the path to the HTML file
+        const htmlPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'canvas.html');
+        
+        try {
+            // Read the HTML file
+            const htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
+            return htmlContent;
+        } catch (error) {
+            console.error('Error loading HTML file:', error);
+            // Fallback HTML if file can't be loaded
+            return `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>ShowOff Canvas - Error</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            font-family: var(--vscode-font-family);
+                            background-color: var(--vscode-editor-background);
+                            color: var(--vscode-editor-foreground);
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>ShowOff Canvas</h1>
+                    <p>Error loading canvas.html file. Using fallback content.</p>
+                    <p>Error: ${error}</p>
+                </body>
+                </html>`;
+        }
     }
 }

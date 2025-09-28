@@ -67,11 +67,20 @@
         }
         
         .screen-content {
-            color: var(--vscode-descriptionForeground);
-            font-size: 0.8em;
-            font-style: italic;
-            text-align: center;
-            padding: 20px;
+            color: var(--vscode-foreground);
+            font-size: 0.85em;
+            padding: 10px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .text-screen .screen-content {
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: var(--vscode-editor-font-family);
         }
         
         .placeholder {
@@ -88,15 +97,55 @@
         <div class="subtitle">Multi-screen workspace for AI interaction</div>
     </div>
     
-    <div class="screens-container">
-        <div class="placeholder">
-            Virtual screens will appear here<br>
-            Milestone 2 complete - ready for screen management tool
+    <div class="screens-container" id="screensContainer">
+        <!-- Virtual Screen 1: Text Screen -->
+        <div class="virtual-screen text-screen" id="screen-1">
+            <div class="screen-title">📄 Text Screen #1</div>
+            <div class="screen-content" id="screen-1-content">
+                Welcome to Virtual Screen #1!<br><br>
+                This is a text-based virtual screen where AI can display information, lists, code snippets, or any text content.<br><br>
+                <em>Ready for AI-generated content...</em>
+            </div>
         </div>
     </div>
     
     <script>
         console.log('Virtual Screens webview loaded successfully!');
+        
+        // Virtual screen management functions
+        function updateTextScreen(screenId, content) {
+            const screenElement = document.getElementById(`screen-${screenId}-content`);
+            if (screenElement) {
+                screenElement.textContent = content;
+                console.log(`Updated text screen ${screenId} with new content`);
+            } else {
+                console.error(`Text screen ${screenId} not found`);
+            }
+        }
+        
+        function createTextScreen(screenId, title, content) {
+            const container = document.getElementById('screensContainer');
+            
+            const screenDiv = document.createElement('div');
+            screenDiv.className = 'virtual-screen text-screen';
+            screenDiv.id = `screen-${screenId}`;
+            
+            screenDiv.innerHTML = `
+                <div class="screen-title">📄 ${title}</div>
+                <div class="screen-content" id="screen-${screenId}-content">${content}</div>
+            `;
+            
+            container.appendChild(screenDiv);
+            console.log(`Created new text screen: ${screenId}`);
+        }
+        
+        function clearScreen(screenId) {
+            const screenElement = document.getElementById(`screen-${screenId}-content`);
+            if (screenElement) {
+                screenElement.textContent = '';
+                console.log(`Cleared screen ${screenId}`);
+            }
+        }
         
         // Handle messages from the extension
         window.addEventListener('message', event => {
@@ -104,9 +153,14 @@
             console.log('Received message from extension:', message);
             
             switch (message.command) {
-                case 'updateScreens':
-                    // Future: handle screen updates from tool
-                    console.log('Screen update requested:', message);
+                case 'updateTextScreen':
+                    updateTextScreen(message.screenId, message.content);
+                    break;
+                case 'createTextScreen':
+                    createTextScreen(message.screenId, message.title, message.content);
+                    break;
+                case 'clearScreen':
+                    clearScreen(message.screenId);
                     break;
             }
         });

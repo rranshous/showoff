@@ -1,0 +1,49 @@
+{
+  "name": "showoff",
+  "displayName": "ShowOff - Visual Copilot Canvas",
+  "description": "Gives Copilot a visual canvas to draw and collaborate",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "views": {
+      "showoff-sidebar": [
+        {
+          "type": "webview",
+          "id": "showoff.canvasView",
+          "name": "Canvas",
+          "icon": "$(symbol-color)"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "showoff-sidebar",
+          "title": "ShowOff Canvas",
+          "icon": "$(symbol-color)"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "showoff.showCanvas",
+        "title": "Show Canvas"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  }
+}

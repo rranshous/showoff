@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
     };
 
     // Register the tool with VS Code
-    const toolRegistration = vscode.lm.registerTool('showoff_draw_canvas', drawCanvasTool);
+    const toolRegistration = vscode.lm.registerTool('draw_canvas', drawCanvasTool);
     context.subscriptions.push(toolRegistration);
     
     console.log('ShowOff: Canvas drawing tool registered successfully!');

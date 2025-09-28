@@ -37,9 +37,23 @@
     ],
     "languageModelTools": [
       {
-        "name": "showoff_draw_canvas",
+        "name": "draw_canvas",
         "displayName": "ShowOff Canvas Drawing Tool",
-        "modelDescription": "Draw on the ShowOff visual canvas using JavaScript. Takes a JavaScript function as a string that will be executed in the canvas context to draw shapes, text, or other visualizations."
+        "modelDescription": "Draw on the ShowOff visual canvas using JavaScript. Takes a JavaScript function as a string that will be executed in the canvas context to draw shapes, text, or other visualizations. The function should use standard HTML5 Canvas API methods like fillRect, strokeRect, fillText, arc, etc.",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "draw_canvas",
+        "icon": "$(symbol-color)",
+        "userDescription": "Draw visualizations on the ShowOff canvas using JavaScript code",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "jsFunction": {
+              "type": "string",
+              "description": "JavaScript function code that will be executed in the canvas context. Should use HTML5 Canvas API methods to draw on the canvas (e.g., ctx.fillRect, ctx.arc, ctx.fillText). The canvas context is available as 'ctx' and canvas dimensions as canvas.width/canvas.height."
+            }
+          },
+          "required": ["jsFunction"]
+        }
       }
     ]
   },

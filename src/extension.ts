@@ -10,6 +10,7 @@ interface DrawCanvasInput {
 interface VirtualScreensInput {
     action: 'update' | 'create' | 'clear';
     screenId: number;
+    screenType?: 'text' | 'canvas';
     content?: string;
     title?: string;
 }
@@ -68,10 +69,10 @@ export function activate(context: vscode.ExtensionContext) {
             console.log('Virtual Screens: Action:', options.input.action, 'Screen:', options.input.screenId);
             
             try {
-                const { action, screenId, content, title } = options.input;
+                const { action, screenId, screenType, content, title } = options.input;
                 
                 // Send the screen update to the webview
-                screensProvider.updateScreen(action, screenId, content, title);
+                screensProvider.updateScreen(action, screenId, screenType, content, title);
                 
                 let actionDescription = '';
                 switch (action) {

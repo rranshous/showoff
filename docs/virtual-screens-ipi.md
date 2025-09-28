@@ -78,3 +78,15 @@ We are only adding one new tool, it will support managing multiple virtual scree
 - Extension now has both canvas drawing and virtual screens management tools available
 
 **To test:** Press F5 to launch Extension Development Host. Use Copilot with #virtual_screens or let agent mode automatically invoke the tool. Copilot can now create, update, and clear virtual text screens with commands like "show my todo list on screen 2" or "create a new screen with project status".
+
+### ✅ Milestone 5: Add two more virtual screens (one canvas one text?)
+- Added canvas screen (#2) with HTML5 canvas element and drawing capabilities
+- Added third text screen (#3) to demonstrate multiple text screen support
+- Implemented JavaScript functions for canvas screen management (create, update, clear)
+- Updated tool schema to support screenType parameter ('text' or 'canvas')
+- Enhanced VirtualScreensProvider to handle both text and canvas screen types
+- Added proper styling for canvas screens with responsive design and VS Code theme
+- Canvas screens support JavaScript drawing code execution (like draw_canvas tool)
+- Extension now supports mixed screen types for comprehensive AI interaction
+
+**To test:** Press F5 to launch Extension Development Host. Open Virtual Screens panel to see 3 screens: text (#1), canvas (#2), and text (#3). Use Copilot with commands like "draw a chart on canvas screen 2" or "update text screen 3 with meeting notes". The tool now supports both text content and JavaScript drawing commands.

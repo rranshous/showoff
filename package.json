@@ -88,9 +88,14 @@
               "type": "number",
               "description": "Numeric ID of the screen to manage (1, 2, 3, etc.). Use consistent IDs to reference the same screen across operations."
             },
+            "screenType": {
+              "type": "string",
+              "enum": ["text", "canvas"],
+              "description": "Type of screen: 'text' for text content or 'canvas' for drawing. Required when creating new screens."
+            },
             "content": {
               "type": "string",
-              "description": "Text content to display on the screen. Supports plain text, line breaks (\\n), and basic formatting. Leave empty or omit for 'clear' action."
+              "description": "For text screens: text content to display. For canvas screens: JavaScript code to execute (function body only, like draw_canvas tool). Leave empty or omit for 'clear' action."
             },
             "title": {
               "type": "string",

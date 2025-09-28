@@ -12,15 +12,27 @@ export class VirtualScreensProvider implements vscode.WebviewViewProvider {
         private readonly _extensionUri: vscode.Uri,
     ) { }
 
-    public updateScreen(action: string, screenId: number, content?: string, title?: string): void {
+    public updateScreen(action: string, screenId: number, screenType?: string, content?: string, title?: string): void {
         if (this._view) {
+            let command = 'clearScreen';
+            
+            if (action === 'update') {
+                command = screenType === 'canvas' ? 'updateCanvasScreen' : 'updateTextScreen';
+            } else if (action === 'create') {
+                command = screenType === 'canvas' ? 'createCanvasScreen' : 'createTextScreen';
+            }
+            
             const message: any = {
-                command: action === 'update' ? 'updateTextScreen' : action === 'create' ? 'createTextScreen' : 'clearScreen',
+                command: command,
                 screenId: screenId
             };
             
             if (content !== undefined) {
-                message.content = content;
+                if (screenType === 'canvas') {
+                    message.jsFunction = content;
+                } else {
+                    message.content = content;
+                }
             }
             
             if (title !== undefined) {
@@ -28,7 +40,7 @@ export class VirtualScreensProvider implements vscode.WebviewViewProvider {
             }
             
             this._view.webview.postMessage(message);
-            console.log(`Virtual Screens: ${action} screen ${screenId}`);
+            console.log(`Virtual Screens: ${action} ${screenType || 'screen'} ${screenId}`);
         } else {
             console.error('Virtual Screens: Cannot update screen - webview not available');
         }

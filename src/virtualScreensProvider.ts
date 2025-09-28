@@ -45,49 +45,38 @@ export class VirtualScreensProvider implements vscode.WebviewViewProvider {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        // For now, simple HTML - we'll create a proper file in Milestone 2
-        return `<!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval';">
-                <title>Virtual Screens</title>
-                <style>
-                    body {
-                        font-family: var(--vscode-font-family);
-                        background-color: var(--vscode-editor-background);
-                        color: var(--vscode-editor-foreground);
-                        margin: 0;
-                        padding: 20px;
-                        height: 100vh;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .placeholder {
-                        text-align: center;
-                        color: var(--vscode-descriptionForeground);
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="placeholder">
-                    <h2>🖥️ Virtual Screens</h2>
-                    <p>Virtual screen panel loaded successfully!</p>
-                    <p>Milestone 1 complete - ready for virtual screen implementation</p>
-                </div>
-                
-                <script>
-                    console.log('Virtual Screens webview loaded!');
-                    
-                    // Send ready signal to extension
-                    if (typeof acquireVsCodeApi !== 'undefined') {
-                        const vscode = acquireVsCodeApi();
-                        vscode.postMessage({ command: 'webview-ready' });
-                    }
-                </script>
-            </body>
-            </html>`;
+        // Get the path to the HTML file
+        const htmlPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'virtual-screens.html');
+        
+        try {
+            // Read the HTML file
+            const htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
+            return htmlContent;
+        } catch (error) {
+            console.error('Error loading virtual-screens.html file:', error);
+            // Fallback HTML if file can't be loaded
+            return `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Virtual Screens - Error</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            font-family: var(--vscode-font-family);
+                            background-color: var(--vscode-editor-background);
+                            color: var(--vscode-editor-foreground);
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Virtual Screens</h1>
+                    <p>Error loading virtual-screens.html file. Using fallback content.</p>
+                    <p>Error: ${error}</p>
+                </body>
+                </html>`;
+        }
     }
 }

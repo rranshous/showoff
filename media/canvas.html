@@ -73,12 +73,18 @@
         
         .canvas-area {
             background-color: var(--vscode-input-background);
-            border: 2px dashed var(--vscode-panel-border);
+            border: 2px solid var(--vscode-panel-border);
             border-radius: 8px;
-            padding: 40px;
+            padding: 20px;
             text-align: center;
-            color: var(--vscode-descriptionForeground);
-            font-style: italic;
+        }
+        
+        #drawingCanvas {
+            border: 1px solid var(--vscode-focusBorder);
+            border-radius: 4px;
+            background-color: white;
+            display: block;
+            margin: 0 auto;
         }
         
         .footer {
@@ -109,8 +115,8 @@
                 <span>Webview panel active</span>
             </div>
             <div class="status-item">
-                <span class="status-icon">⏳</span>
-                <span>Canvas drawing capabilities - coming in Milestone 3</span>
+                <span class="status-icon">✅</span>
+                <span>Canvas drawing capabilities - active</span>
             </div>
             <div class="status-item">
                 <span class="status-icon">⏳</span>
@@ -119,17 +125,70 @@
         </div>
         
         <div class="canvas-area">
-            Canvas area will appear here in the next milestone<br>
-            This space is reserved for AI-generated drawings and visualizations
+            <div style="margin-bottom: 15px; color: var(--vscode-foreground);">
+                <strong>Interactive Drawing Canvas</strong>
+            </div>
+            <canvas id="drawingCanvas" width="400" height="300"></canvas>
+            <div style="margin-top: 15px; font-size: 0.9em; color: var(--vscode-descriptionForeground);">
+                Canvas ready for AI-generated visualizations
+            </div>
         </div>
     </div>
     
     <div class="footer">
-        ShowOff Extension v0.0.1 | Milestone 2 Complete
+        ShowOff Extension v0.0.1 | Milestone 3 Complete
     </div>
     
     <script>
         console.log('ShowOff webview loaded successfully!');
+        
+        // Initialize canvas when page loads
+        function initializeCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            if (!canvas) {
+                console.error('Canvas element not found!');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas with white background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw "Hello World" text
+            ctx.fillStyle = '#007ACC'; // VS Code blue
+            ctx.font = 'bold 24px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Calculate center position
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Draw the text
+            ctx.fillText('Hello World!', centerX, centerY);
+            
+            // Add a decorative underline
+            ctx.strokeStyle = '#007ACC';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 80, centerY + 15);
+            ctx.lineTo(centerX + 80, centerY + 15);
+            ctx.stroke();
+            
+            console.log('Canvas initialized with Hello World text');
+        }
+        
+        // Initialize canvas when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeCanvas);
+        
+        // Also try to initialize immediately if DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeCanvas);
+        } else {
+            initializeCanvas();
+        }
         
         // This will be used for communication with the extension
         window.addEventListener('message', event => {

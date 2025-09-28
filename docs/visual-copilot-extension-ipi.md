@@ -17,7 +17,7 @@ Typescript
 ### Milestones
 1. basic extension which has an activity button which opens a panel
 2. Update the panel to show a web page
-3. update the webpage to have a canvas and some random shapes
+3. update the webpage to have a canvas with hello world text on it
 4. register a tool with copilot that takes a js function as arg and prints it to console
 5. have the tool run the js function in the side panel and draw on the canvas
 6. test and refine
@@ -43,3 +43,12 @@ Typescript
 - Enhanced UI with status cards, proper layout, and milestone progress tracking
 
 **To test:** Press F5 to launch Extension Development Host. The ShowOff panel now shows a professionally styled web page with extension status, progress indicators, and a reserved canvas area.
+
+### ✅ Milestone 3: Canvas with Hello World text
+- Added HTML5 canvas element (400x300px) to the webview panel
+- Implemented JavaScript canvas initialization with "Hello World!" text drawing
+- Added VS Code blue styling (#007ACC) with decorative underline
+- Updated status indicators to show active canvas capabilities
+- Canvas renders text centered with professional typography
+
+**To test:** Press F5 to launch Extension Development Host. Click the ShowOff icon in the activity bar to see the panel with an active canvas displaying "Hello World!" text in VS Code blue with a decorative underline.

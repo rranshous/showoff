@@ -15,10 +15,9 @@ The project is named `showoff`. use that for any package names etc.
 Typescript
 
 ### Milestones
-1. basic extension with side panel and canvas showing a loading message.
-  - panel opens when button on left hand side of VSCode is clicked (activity bar)
-  - panel shows html content with canvas
-  - canvas has some random shapes and colors and a loading message
+1. basic extension which has an activity button which opens a panel
+2. Update the panel to show a web page
+3. update the webpage to have a canvas and some random shapes
 2. register a tool with copilot that takes a js function as arg and prints it to console
 3. have the tool run the js function in the side panel and draw on the canvas
 4. test and refine

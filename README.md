@@ -2,6 +2,9 @@
 
 Give Copilot a visual canvas to draw and collaborate! 🎨
 
+<img width="1966" height="803" alt="Screenshot from 2025-09-28 18-35-41" src="https://github.com/user-attachments/assets/7128ee5a-f45c-481e-ab9a-5e65005ec3d5" />
+
+
 ## Overview
 
 ShowOff is a VS Code extension that provides Copilot with a dedicated visual canvas for drawing, charting, and creating visualizations. Instead of being limited to text responses, Copilot can now draw shapes, create diagrams, build charts, and visualize data directly on an interactive HTML5 canvas.

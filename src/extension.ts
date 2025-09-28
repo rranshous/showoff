@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ShowOffCanvasProvider } from './canvasProvider';
+import { VirtualScreensProvider } from './virtualScreensProvider';
 
 // Interface for our tool input
 interface DrawCanvasInput {
@@ -9,11 +10,13 @@ interface DrawCanvasInput {
 export function activate(context: vscode.ExtensionContext) {
     console.log('ShowOff extension is now active!');
 
-    // Register the webview provider
-    const provider = new ShowOffCanvasProvider(context.extensionUri);
+    // Register the webview providers
+    const canvasProvider = new ShowOffCanvasProvider(context.extensionUri);
+    const screensProvider = new VirtualScreensProvider(context.extensionUri);
     
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('showoff.canvasView', provider)
+        vscode.window.registerWebviewViewProvider('showoff.canvasView', canvasProvider),
+        vscode.window.registerWebviewViewProvider('virtualscreens.screensView', screensProvider)
     );
 
     // Register the show canvas command
@@ -31,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
             
             try {
                 // Send the JavaScript function to the webview for execution
-                provider.executeJavaScript(options.input.jsFunction);
+                canvasProvider.executeJavaScript(options.input.jsFunction);
                 
                 return new vscode.LanguageModelToolResult([
                     new vscode.LanguageModelTextPart(`Successfully executed JavaScript on the ShowOff canvas. The drawing commands have been sent to the canvas webview.`)

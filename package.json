@@ -18,6 +18,14 @@
           "name": "Canvas",
           "icon": "$(symbol-color)"
         }
+      ],
+      "virtualscreens-sidebar": [
+        {
+          "type": "webview",
+          "id": "virtualscreens.screensView",
+          "name": "Virtual Screens",
+          "icon": "$(device-desktop)"
+        }
       ]
     },
     "viewsContainers": {
@@ -26,6 +34,11 @@
           "id": "showoff-sidebar",
           "title": "ShowOff Canvas",
           "icon": "$(symbol-color)"
+        },
+        {
+          "id": "virtualscreens-sidebar",
+          "title": "Virtual Screens",
+          "icon": "$(device-desktop)"
         }
       ]
     },

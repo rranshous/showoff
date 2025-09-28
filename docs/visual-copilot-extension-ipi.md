@@ -52,3 +52,13 @@ Typescript
 - Canvas renders text centered with professional typography
 
 **To test:** Press F5 to launch Extension Development Host. Click the ShowOff icon in the activity bar to see the panel with an active canvas displaying "Hello World!" text in VS Code blue with a decorative underline.
+
+### ✅ Milestone 4: Register Copilot tool for JavaScript execution
+- Added `languageModelTools` contribution point to package.json for "showoff_draw_canvas" tool
+- Implemented LanguageModelTool interface with invoke() and prepareInvocation() methods
+- Created tool handler that accepts JavaScript function string as input parameter
+- Added console logging functionality to capture and display received JS functions
+- Updated VS Code API version to ^1.90.0 to support language model tools
+- Tool registration includes proper TypeScript typing with DrawCanvasInput interface
+
+**To test:** Press F5 to launch Extension Development Host. The tool is now registered and available to Copilot. When Copilot calls the "showoff_draw_canvas" tool with a JavaScript function, it will be logged to the console with confirmation message returned.

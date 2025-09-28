@@ -67,6 +67,38 @@
           },
           "required": ["jsFunction"]
         }
+      },
+      {
+        "name": "manage_virtual_screens",
+        "displayName": "Virtual Screens Management Tool",
+        "modelDescription": "Manage multiple virtual screens for displaying text content, information, lists, code snippets, or any textual data. Each screen is identified by a unique ID (1, 2, 3, etc.) and can be created, updated, or cleared independently. Virtual screens are persistent and remain visible until updated. Use this tool to organize information across multiple screens for better user experience.",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "virtual_screens",
+        "icon": "$(device-desktop)",
+        "userDescription": "Manage multiple virtual text screens for organized information display",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": ["update", "create", "clear"],
+              "description": "Action to perform: 'update' to modify existing screen content, 'create' to make a new screen, 'clear' to empty a screen"
+            },
+            "screenId": {
+              "type": "number",
+              "description": "Numeric ID of the screen to manage (1, 2, 3, etc.). Use consistent IDs to reference the same screen across operations."
+            },
+            "content": {
+              "type": "string",
+              "description": "Text content to display on the screen. Supports plain text, line breaks (\\n), and basic formatting. Leave empty or omit for 'clear' action."
+            },
+            "title": {
+              "type": "string",
+              "description": "Optional title for the screen when creating new screens. If not provided, defaults to 'Screen #X'"
+            }
+          },
+          "required": ["action", "screenId"]
+        }
       }
     ]
   },

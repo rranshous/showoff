@@ -67,3 +67,14 @@ We are only adding one new tool, it will support managing multiple virtual scree
 - Text screens support pre-formatted text, line breaks, and proper typography
 
 **To test:** Press F5 to launch Extension Development Host. Click the Virtual Screens icon to see the first functional text screen displaying welcome content. The screen management functions are ready for AI tool integration.
+
+### ✅ Milestone 4: Add a new tool so the model can set content
+- Added "manage_virtual_screens" tool configuration to package.json languageModelTools
+- Created VirtualScreensInput interface with action, screenId, content, and title properties
+- Implemented tool handler supporting create, update, and clear actions for virtual screens
+- Added updateScreen method to VirtualScreensProvider for webview communication
+- Registered virtual screens management tool with VS Code language model API
+- Tool supports multiple screen management with proper confirmation messages and error handling
+- Extension now has both canvas drawing and virtual screens management tools available
+
+**To test:** Press F5 to launch Extension Development Host. Use Copilot with #virtual_screens or let agent mode automatically invoke the tool. Copilot can now create, update, and clear virtual text screens with commands like "show my todo list on screen 2" or "create a new screen with project status".

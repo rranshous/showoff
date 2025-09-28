@@ -2,9 +2,16 @@ import * as vscode from 'vscode';
 import { ShowOffCanvasProvider } from './canvasProvider';
 import { VirtualScreensProvider } from './virtualScreensProvider';
 
-// Interface for our tool input
+// Interface for our tool inputs
 interface DrawCanvasInput {
     jsFunction: string;
+}
+
+interface VirtualScreensInput {
+    action: 'update' | 'create' | 'clear';
+    screenId: number;
+    content?: string;
+    title?: string;
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -54,11 +61,57 @@ export function activate(context: vscode.ExtensionContext) {
         }
     };
 
-    // Register the tool with VS Code
-    const toolRegistration = vscode.lm.registerTool('draw_canvas', drawCanvasTool);
-    context.subscriptions.push(toolRegistration);
+    // Register the virtual screens tool for managing multiple text screens
+    const virtualScreensTool: vscode.LanguageModelTool<VirtualScreensInput> = {
+        invoke: async (options: vscode.LanguageModelToolInvocationOptions<VirtualScreensInput>, token: vscode.CancellationToken) => {
+            console.log('Virtual Screens: Tool invoked!');
+            console.log('Virtual Screens: Action:', options.input.action, 'Screen:', options.input.screenId);
+            
+            try {
+                const { action, screenId, content, title } = options.input;
+                
+                // Send the screen update to the webview
+                screensProvider.updateScreen(action, screenId, content, title);
+                
+                let actionDescription = '';
+                switch (action) {
+                    case 'create':
+                        actionDescription = `Created screen ${screenId}${title ? ` titled "${title}"` : ''}`;
+                        break;
+                    case 'update':
+                        actionDescription = `Updated screen ${screenId} with new content`;
+                        break;
+                    case 'clear':
+                        actionDescription = `Cleared screen ${screenId}`;
+                        break;
+                }
+                
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(`Virtual Screens: ${actionDescription}. Content has been sent to the virtual screens panel.`)
+                ]);
+            } catch (error) {
+                console.error('Virtual Screens: Error managing screen:', error);
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(`Error managing virtual screen: ${error}`)
+                ]);
+            }
+        },
+        
+        prepareInvocation: async (options, token) => {
+            const { action, screenId, title } = options.input;
+            return {
+                invocationMessage: `Managing virtual screen ${screenId}: ${action}${title ? ` "${title}"` : ''}`
+            };
+        }
+    };
+
+    // Register the tools with VS Code
+    const canvasToolRegistration = vscode.lm.registerTool('draw_canvas', drawCanvasTool);
+    const screensToolRegistration = vscode.lm.registerTool('manage_virtual_screens', virtualScreensTool);
+    context.subscriptions.push(canvasToolRegistration, screensToolRegistration);
     
     console.log('ShowOff: Canvas drawing tool registered successfully!');
+    console.log('Virtual Screens: Management tool registered successfully!');
 }
 
 export function deactivate() {}

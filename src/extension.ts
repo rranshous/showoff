@@ -29,12 +29,19 @@ export function activate(context: vscode.ExtensionContext) {
             console.log('ShowOff: Draw canvas tool invoked!');
             console.log('ShowOff: Received JavaScript function:', options.input.jsFunction);
             
-            // For Milestone 4, we just log to console
-            // In Milestone 5, we'll execute this in the webview
-            
-            return new vscode.LanguageModelToolResult([
-                new vscode.LanguageModelTextPart(`Successfully received JavaScript function for canvas drawing. Function logged to console: ${options.input.jsFunction.substring(0, 100)}...`)
-            ]);
+            try {
+                // Send the JavaScript function to the webview for execution
+                provider.executeJavaScript(options.input.jsFunction);
+                
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(`Successfully executed JavaScript on the ShowOff canvas. The drawing commands have been sent to the canvas webview.`)
+                ]);
+            } catch (error) {
+                console.error('ShowOff: Error executing JavaScript on canvas:', error);
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(`Error executing JavaScript on canvas: ${error}`)
+                ]);
+            }
         },
         
         prepareInvocation: async (options, token) => {

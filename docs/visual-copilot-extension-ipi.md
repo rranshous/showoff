@@ -62,3 +62,13 @@ Typescript
 - Tool registration includes proper TypeScript typing with DrawCanvasInput interface
 
 **To test:** Press F5 to launch Extension Development Host. The tool is now registered and available to Copilot. When Copilot calls the "showoff_draw_canvas" tool with a JavaScript function, it will be logged to the console with confirmation message returned.
+
+### ✅ Milestone 5: Execute JavaScript in webview canvas
+- Added executeJavaScript method to ShowOffCanvasProvider for sending JS to webview
+- Implemented secure JavaScript execution in canvas.html with proper error handling
+- Updated tool handler to send JavaScript functions to webview instead of console logging
+- Added canvas context (ctx) and canvas object availability for drawing functions
+- Implemented error display on canvas when JavaScript execution fails
+- Tool now executes user JavaScript directly on the HTML5 canvas in real-time
+
+**To test:** Press F5 to launch Extension Development Host. Open the ShowOff panel and use Copilot in chat. Reference the tool with #draw_canvas or let agent mode automatically invoke it. Copilot can now draw shapes, text, and visualizations directly on the canvas using JavaScript like `ctx.fillRect(10, 10, 100, 50)` or `ctx.fillText('Hello!', 50, 100)`.

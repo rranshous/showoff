@@ -190,11 +190,47 @@
             initializeCanvas();
         }
         
-        // This will be used for communication with the extension
+        // Handle messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
             console.log('Received message from extension:', message);
+            
+            switch (message.command) {
+                case 'executeJS':
+                    executeCanvasJavaScript(message.jsFunction);
+                    break;
+            }
         });
+
+        // Function to safely execute JavaScript on the canvas
+        function executeCanvasJavaScript(jsFunction) {
+            const canvas = document.getElementById('drawingCanvas');
+            if (!canvas) {
+                console.error('Canvas not found!');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            try {
+                console.log('Executing JavaScript on canvas:', jsFunction);
+                
+                // Create a function that provides the canvas context
+                const userFunction = new Function('ctx', 'canvas', jsFunction);
+                
+                // Execute the user's function with canvas context
+                userFunction(ctx, canvas);
+                
+                console.log('JavaScript executed successfully on canvas');
+            } catch (error) {
+                console.error('Error executing JavaScript on canvas:', error);
+                
+                // Draw error message on canvas
+                ctx.fillStyle = 'red';
+                ctx.font = '14px Arial';
+                ctx.fillText('Error executing JS: ' + error.message, 10, 30);
+            }
+        }
         
         // Send ready signal to extension
         if (typeof acquireVsCodeApi !== 'undefined') {

@@ -6,6 +6,9 @@ I want to give copilot more space for collaboration
 
 Create a VSCode extension which hooks in a tool so that copilot can draw on a canvas in a side panel using a js function
 
+## Project name
+The project is named `showoff`. use that for any package names etc.
+
 ## Plan
 
 ### Technical 
@@ -13,7 +16,7 @@ Typescript
 
 ### Milestones
 1. basic extension with side panel and canvas showing a loading message.
-  - panel opens when button on left hand side of VSCode is clicked
+  - panel opens when button on left hand side of VSCode is clicked (activity bar)
   - panel shows html content with canvas
   - canvas has some random shapes and colors and a loading message
 2. register a tool with copilot that takes a js function as arg and prints it to console

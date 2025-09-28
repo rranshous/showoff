@@ -16,133 +16,30 @@
             font-family: var(--vscode-font-family);
             background-color: var(--vscode-editor-background);
             color: var(--vscode-editor-foreground);
-            padding: 20px;
+            margin: 0;
+            padding: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-        
-        .header {
-            border-bottom: 1px solid var(--vscode-panel-border);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        
-        h1 {
-            color: var(--vscode-titleBar-activeForeground);
-            font-size: 1.5em;
-            margin-bottom: 5px;
-        }
-        
-        .subtitle {
-            color: var(--vscode-descriptionForeground);
-            font-size: 0.9em;
-        }
-        
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .status-card {
-            background-color: var(--vscode-editor-inactiveSelectionBackground);
-            border: 1px solid var(--vscode-panel-border);
-            border-radius: 6px;
-            padding: 15px;
-        }
-        
-        .status-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--vscode-foreground);
-        }
-        
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 5px 0;
-        }
-        
-        .status-icon {
-            color: var(--vscode-charts-green);
-            font-weight: bold;
-        }
-        
-        .canvas-area {
-            background-color: var(--vscode-input-background);
-            border: 2px solid var(--vscode-panel-border);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
+            overflow: hidden;
         }
         
         #drawingCanvas {
-            border: 1px solid var(--vscode-focusBorder);
-            border-radius: 4px;
-            background-color: white;
+            width: 100%;
+            height: 100%;
+            background-color: var(--vscode-editor-background);
             display: block;
-            margin: 0 auto;
-        }
-        
-        .footer {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid var(--vscode-panel-border);
-            font-size: 0.8em;
-            color: var(--vscode-descriptionForeground);
-            text-align: center;
+            border: none;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🎨 ShowOff Visual Canvas</h1>
-        <div class="subtitle">Interactive drawing space for AI collaboration</div>
-    </div>
-    
-    <div class="content">
-        <div class="status-card">
-            <div class="status-title">Extension Status</div>
-            <div class="status-item">
-                <span class="status-icon">✅</span>
-                <span>Extension loaded successfully</span>
-            </div>
-            <div class="status-item">
-                <span class="status-icon">✅</span>
-                <span>Webview panel active</span>
-            </div>
-            <div class="status-item">
-                <span class="status-icon">✅</span>
-                <span>Canvas drawing capabilities - active</span>
-            </div>
-            <div class="status-item">
-                <span class="status-icon">⏳</span>
-                <span>AI tool integration - coming in Milestone 4</span>
-            </div>
-        </div>
-        
-        <div class="canvas-area">
-            <div style="margin-bottom: 15px; color: var(--vscode-foreground);">
-                <strong>Interactive Drawing Canvas</strong>
-            </div>
-            <canvas id="drawingCanvas" width="400" height="300"></canvas>
-            <div style="margin-top: 15px; font-size: 0.9em; color: var(--vscode-descriptionForeground);">
-                Canvas ready for AI-generated visualizations
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        ShowOff Extension v0.0.1 | Milestone 3 Complete
-    </div>
+    <canvas id="drawingCanvas"></canvas></body>
     
     <script>
         console.log('ShowOff webview loaded successfully!');
         
-        // Initialize canvas when page loads
+        // Initialize responsive canvas
         function initializeCanvas() {
             const canvas = document.getElementById('drawingCanvas');
             if (!canvas) {
@@ -150,34 +47,44 @@
                 return;
             }
             
-            const ctx = canvas.getContext('2d');
+            // Function to resize canvas to match display size
+            function resizeCanvas() {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const ctx = canvas.getContext('2d');
+                // Clear canvas (transparent background)
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw placeholder text
+                drawPlaceholder(ctx, canvas);
+                
+                console.log(`Canvas resized to ${canvas.width}x${canvas.height}`);
+            }
             
-            // Clear canvas with white background
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Function to draw placeholder text
+            function drawPlaceholder(ctx, canvas) {
+                ctx.fillStyle = 'rgba(128, 128, 128, 0.5)'; // Semi-transparent gray
+                ctx.font = '16px Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                ctx.fillText('Canvas ready for AI drawings...', centerX, centerY - 10);
+                ctx.font = '12px Arial, sans-serif';
+                ctx.fillText('Use #draw_canvas or ask Copilot to draw something', centerX, centerY + 15);
+            }
             
-            // Draw "Hello World" text
-            ctx.fillStyle = '#007ACC'; // VS Code blue
-            ctx.font = 'bold 24px Arial, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+            // Initial resize
+            resizeCanvas();
             
-            // Calculate center position
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+            // Resize on window resize
+            window.addEventListener('resize', resizeCanvas);
             
-            // Draw the text
-            ctx.fillText('Hello World!', centerX, centerY);
-            
-            // Add a decorative underline
-            ctx.strokeStyle = '#007ACC';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(centerX - 80, centerY + 15);
-            ctx.lineTo(centerX + 80, centerY + 15);
-            ctx.stroke();
-            
-            console.log('Canvas initialized with Hello World text');
+            console.log('Canvas initialized and ready for drawing');
         }
         
         // Initialize canvas when DOM is loaded
@@ -215,6 +122,9 @@
             try {
                 console.log('Executing JavaScript on canvas:', jsFunction);
                 
+                // Clear canvas before drawing (removes placeholder)
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
                 // Create a function that provides the canvas context
                 const userFunction = new Function('ctx', 'canvas', jsFunction);
                 
@@ -225,10 +135,13 @@
             } catch (error) {
                 console.error('Error executing JavaScript on canvas:', error);
                 
-                // Draw error message on canvas
-                ctx.fillStyle = 'red';
-                ctx.font = '14px Arial';
-                ctx.fillText('Error executing JS: ' + error.message, 10, 30);
+                // Clear canvas and show error
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ff4444';
+                ctx.font = '14px Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText('Error executing JS: ' + error.message, 10, 10);
             }
         }
         

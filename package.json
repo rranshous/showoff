@@ -39,7 +39,7 @@
       {
         "name": "draw_canvas",
         "displayName": "ShowOff Canvas Drawing Tool",
-        "modelDescription": "Draw on the ShowOff visual canvas using JavaScript. Takes a JavaScript function as a string that will be executed in the canvas context to draw shapes, text, or other visualizations. The function should use standard HTML5 Canvas API methods like fillRect, strokeRect, fillText, arc, etc.",
+        "modelDescription": "Draw on the ShowOff visual canvas using JavaScript. The canvas fills the entire panel and automatically resizes to match the available space. Takes a JavaScript function as a string that will be executed in the canvas context to draw shapes, text, or other visualizations. The function should use standard HTML5 Canvas API methods like fillRect, strokeRect, fillText, arc, etc. Canvas dimensions are available via canvas.width and canvas.height properties.",
         "canBeReferencedInPrompt": true,
         "toolReferenceName": "draw_canvas",
         "icon": "$(symbol-color)",
@@ -49,7 +49,7 @@
           "properties": {
             "jsFunction": {
               "type": "string",
-              "description": "JavaScript function code that will be executed in the canvas context. Should use HTML5 Canvas API methods to draw on the canvas (e.g., ctx.fillRect, ctx.arc, ctx.fillText). The canvas context is available as 'ctx' and canvas dimensions as canvas.width/canvas.height."
+              "description": "JavaScript function code that will be executed in the canvas context. Should use HTML5 Canvas API methods to draw on the canvas (e.g., ctx.fillRect, ctx.arc, ctx.fillText). The canvas context is available as 'ctx' and canvas dimensions as canvas.width/canvas.height. The canvas fills the entire panel and resizes automatically. It is a persistent, side, view you can use to communicate with your user."
             }
           },
           "required": ["jsFunction"]

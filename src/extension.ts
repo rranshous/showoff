@@ -8,7 +8,7 @@ interface DrawCanvasInput {
 }
 
 interface VirtualScreensInput {
-    action: 'update' | 'create' | 'clear';
+    action: 'create' | 'update' | 'clear' | 'read';
     screenId: number;
     screenType?: 'text' | 'canvas';
     content?: string;
@@ -71,25 +71,41 @@ export function activate(context: vscode.ExtensionContext) {
             try {
                 const { action, screenId, screenType, content, title } = options.input;
                 
-                // Send the screen update to the webview
-                screensProvider.updateScreen(action, screenId, screenType, content, title);
-                
-                let actionDescription = '';
-                switch (action) {
-                    case 'create':
-                        actionDescription = `Created screen ${screenId}${title ? ` titled "${title}"` : ''}`;
-                        break;
-                    case 'update':
-                        actionDescription = `Updated screen ${screenId} with new content`;
-                        break;
-                    case 'clear':
-                        actionDescription = `Cleared screen ${screenId}`;
-                        break;
+                if (action === 'read') {
+                    const screen = screensProvider.readScreen(screenId);
+                    if (screen) {
+                        const contentPreview = screen.type === 'canvas' 
+                            ? `Canvas screen (${screen.content ? 'has drawing code' : 'empty'})`
+                            : screen.content;
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Screen ${screenId} (${screen.type}): "${screen.title}"\nContent: ${contentPreview}`)
+                        ]);
+                    } else {
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Screen ${screenId} does not exist.`)
+                        ]);
+                    }
+                } else {
+                    // Handle create/update/clear actions
+                    screensProvider.updateScreen(action, screenId, screenType, content, title);
+                    
+                    let actionDescription = '';
+                    switch (action) {
+                        case 'create':
+                            actionDescription = `Created screen ${screenId}${title ? ` titled "${title}"` : ''}`;
+                            break;
+                        case 'update':
+                            actionDescription = `Updated screen ${screenId} with new content`;
+                            break;
+                        case 'clear':
+                            actionDescription = `Removed screen ${screenId}`;
+                            break;
+                    }
+                    
+                    return new vscode.LanguageModelToolResult([
+                        new vscode.LanguageModelTextPart(`Virtual Screens: ${actionDescription}. Content has been updated in the virtual screens panel.`)
+                    ]);
                 }
-                
-                return new vscode.LanguageModelToolResult([
-                    new vscode.LanguageModelTextPart(`Virtual Screens: ${actionDescription}. Content has been sent to the virtual screens panel.`)
-                ]);
             } catch (error) {
                 console.error('Virtual Screens: Error managing screen:', error);
                 return new vscode.LanguageModelToolResult([

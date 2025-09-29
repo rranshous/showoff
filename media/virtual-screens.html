@@ -45,8 +45,9 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 0;
             overflow-y: auto;
+            padding-right: 5px; /* Space for scrollbar */
         }
         
         .virtual-screen {
@@ -54,7 +55,10 @@
             border: 1px solid var(--vscode-panel-border);
             border-radius: 6px;
             padding: 10px;
-            min-height: 120px;
+            min-height: 150px;
+            max-height: 300px;
+            flex: 0 0 auto; /* Don't shrink */
+            margin-bottom: 10px;
         }
         
         .screen-title {
@@ -114,137 +118,83 @@
     </div>
     
     <div class="screens-container" id="screensContainer">
-        <!-- Virtual Screen 1: Text Screen -->
-        <div class="virtual-screen text-screen" id="screen-1">
-            <div class="screen-title">📄 Text Screen #1</div>
-            <div class="screen-content" id="screen-1-content">
-                Welcome to Virtual Screen #1!<br><br>
-                This is a text-based virtual screen where AI can display information, lists, code snippets, or any text content.<br><br>
-                <em>Ready for AI-generated content...</em>
-            </div>
-        </div>
-
-        <!-- Virtual Screen 2: Canvas Screen -->
-        <div class="virtual-screen canvas-screen" id="screen-2">
-            <div class="screen-title">🎨 Canvas Screen #2</div>
-            <div class="canvas-container">
-                <canvas id="screen-2-canvas" width="300" height="200"></canvas>
-            </div>
-        </div>
-
-        <!-- Virtual Screen 3: Text Screen -->
-        <div class="virtual-screen text-screen" id="screen-3">
-            <div class="screen-title">📄 Text Screen #3</div>
-            <div class="screen-content" id="screen-3-content">
-                Another text screen for additional content!<br><br>
-                Multiple text screens allow organizing different types of information separately.<br><br>
-                <em>Ready for more AI content...</em>
-            </div>
+        <div class="placeholder" id="emptyPlaceholder">
+            No virtual screens active<br>
+            Use #virtual_screens or ask AI to create screens
         </div>
     </div>
     
     <script>
         console.log('Virtual Screens webview loaded successfully!');
         
-        // Virtual screen management functions
-        function updateTextScreen(screenId, content) {
-            const screenElement = document.getElementById(`screen-${screenId}-content`);
-            if (screenElement) {
-                screenElement.textContent = content;
-                console.log(`Updated text screen ${screenId} with new content`);
-            } else {
-                console.error(`Text screen ${screenId} not found`);
-            }
-        }
+
         
-        function createTextScreen(screenId, title, content) {
+
+
+        // Sync screens from backend state
+        function syncScreens(screens) {
             const container = document.getElementById('screensContainer');
             
-            const screenDiv = document.createElement('div');
-            screenDiv.className = 'virtual-screen text-screen';
-            screenDiv.id = `screen-${screenId}`;
+            // Clear existing screens
+            container.innerHTML = '';
             
-            screenDiv.innerHTML = `
-                <div class="screen-title">📄 ${title}</div>
-                <div class="screen-content" id="screen-${screenId}-content">${content}</div>
-            `;
-            
-            container.appendChild(screenDiv);
-            console.log(`Created new text screen: ${screenId}`);
-        }
-        
-        function clearScreen(screenId) {
-            const screenElement = document.getElementById(`screen-${screenId}-content`);
-            if (screenElement) {
-                screenElement.textContent = '';
-                console.log(`Cleared text screen ${screenId}`);
+            if (screens.length === 0) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'placeholder';
+                placeholder.id = 'emptyPlaceholder';
+                placeholder.innerHTML = 'No virtual screens active<br>Use #virtual_screens or ask AI to create screens';
+                container.appendChild(placeholder);
             } else {
-                // Try canvas screen
-                const canvasElement = document.getElementById(`screen-${screenId}-canvas`);
-                if (canvasElement) {
-                    const ctx = canvasElement.getContext('2d');
-                    ctx.fillStyle = '#f8f8f8';
-                    ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-                    console.log(`Cleared canvas screen ${screenId}`);
-                }
+                screens.forEach(screen => {
+                    const screenDiv = document.createElement('div');
+                    screenDiv.className = `virtual-screen ${screen.type}-screen`;
+                    screenDiv.id = `screen-${screen.id}`;
+                    
+                    if (screen.type === 'text') {
+                        screenDiv.innerHTML = `
+                            <div class="screen-title">${screen.title}</div>
+                            <div class="screen-content" id="screen-${screen.id}-content">${screen.content}</div>
+                        `;
+                    } else { // canvas
+                        screenDiv.innerHTML = `
+                            <div class="screen-title">${screen.title}</div>
+                            <div class="canvas-container">
+                                <canvas id="screen-${screen.id}-canvas" width="300" height="200"></canvas>
+                            </div>
+                        `;
+                        
+                        // Execute canvas content
+                        setTimeout(() => {
+                            const canvas = document.getElementById(`screen-${screen.id}-canvas`);
+                            if (canvas && screen.content) {
+                                const ctx = canvas.getContext('2d');
+                                try {
+                                    // Clear with light background
+                                    ctx.fillStyle = '#f8f8f8';
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    
+                                    // Execute the JavaScript function
+                                    const userFunction = new Function('ctx', 'canvas', screen.content);
+                                    userFunction(ctx, canvas);
+                                } catch (error) {
+                                    console.error(`Error rendering canvas screen ${screen.id}:`, error);
+                                    ctx.fillStyle = '#f8f8f8';
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    ctx.fillStyle = '#ff4444';
+                                    ctx.font = '12px Arial';
+                                    ctx.textAlign = 'left';
+                                    ctx.textBaseline = 'top';
+                                    ctx.fillText('Error: ' + error.message, 5, 5);
+                                }
+                            }
+                        }, 0);
+                    }
+                    
+                    container.appendChild(screenDiv);
+                });
             }
-        }
-
-        function updateCanvasScreen(screenId, jsFunction) {
-            const canvasElement = document.getElementById(`screen-${screenId}-canvas`);
-            if (canvasElement) {
-                const ctx = canvasElement.getContext('2d');
-                
-                try {
-                    // Clear canvas with light background
-                    ctx.fillStyle = '#f8f8f8';
-                    ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-                    
-                    // Execute the JavaScript function
-                    const userFunction = new Function('ctx', 'canvas', jsFunction);
-                    userFunction(ctx, canvasElement);
-                    
-                    console.log(`Updated canvas screen ${screenId} with JavaScript`);
-                } catch (error) {
-                    console.error(`Error executing JavaScript on canvas screen ${screenId}:`, error);
-                    
-                    // Show error on canvas
-                    ctx.fillStyle = '#f8f8f8';
-                    ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-                    ctx.fillStyle = '#ff4444';
-                    ctx.font = '12px Arial';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-                    ctx.fillText('Error: ' + error.message, 5, 5);
-                }
-            } else {
-                console.error(`Canvas screen ${screenId} not found`);
-            }
-        }
-
-        function createCanvasScreen(screenId, title) {
-            const container = document.getElementById('screensContainer');
             
-            const screenDiv = document.createElement('div');
-            screenDiv.className = 'virtual-screen canvas-screen';
-            screenDiv.id = `screen-${screenId}`;
-            
-            screenDiv.innerHTML = `
-                <div class="screen-title">🎨 ${title}</div>
-                <div class="canvas-container">
-                    <canvas id="screen-${screenId}-canvas" width="300" height="200"></canvas>
-                </div>
-            `;
-            
-            container.appendChild(screenDiv);
-            
-            // Initialize canvas
-            const canvas = document.getElementById(`screen-${screenId}-canvas`);
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#f8f8f8';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            console.log(`Created new canvas screen: ${screenId}`);
+            console.log(`Synced ${screens.length} screens to UI`);
         }
         
         // Handle messages from the extension
@@ -253,47 +203,13 @@
             console.log('Received message from extension:', message);
             
             switch (message.command) {
-                case 'updateTextScreen':
-                    updateTextScreen(message.screenId, message.content);
-                    break;
-                case 'createTextScreen':
-                    createTextScreen(message.screenId, message.title, message.content);
-                    break;
-                case 'updateCanvasScreen':
-                    updateCanvasScreen(message.screenId, message.jsFunction);
-                    break;
-                case 'createCanvasScreen':
-                    createCanvasScreen(message.screenId, message.title);
-                    break;
-                case 'clearScreen':
-                    clearScreen(message.screenId);
+                case 'syncScreens':
+                    syncScreens(message.screens);
                     break;
             }
         });
         
-        // Initialize demo canvas screen
-        function initializeDemoScreens() {
-            const canvas2 = document.getElementById('screen-2-canvas');
-            if (canvas2) {
-                const ctx = canvas2.getContext('2d');
-                ctx.fillStyle = '#f8f8f8';
-                ctx.fillRect(0, 0, canvas2.width, canvas2.height);
-                
-                // Draw demo content
-                ctx.fillStyle = '#007ACC';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Canvas Screen Ready!', canvas2.width / 2, canvas2.height / 2 - 10);
-                ctx.font = '12px Arial';
-                ctx.fillText('AI can draw here using JavaScript', canvas2.width / 2, canvas2.height / 2 + 10);
-            }
-        }
-        
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initializeDemoScreens);
-        if (document.readyState !== 'loading') {
-            initializeDemoScreens();
-        }
+
 
         // Send ready signal to extension
         if (typeof acquireVsCodeApi !== 'undefined') {

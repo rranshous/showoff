@@ -2,47 +2,70 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+interface VirtualScreen {
+    id: number;
+    type: 'text' | 'canvas';
+    title: string;
+    content: string;
+}
+
 export class VirtualScreensProvider implements vscode.WebviewViewProvider {
 
     public static readonly viewType = 'virtualscreens.screensView';
 
     private _view?: vscode.WebviewView;
+    private _screens: Map<number, VirtualScreen> = new Map();
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
     ) { }
 
     public updateScreen(action: string, screenId: number, screenType?: string, content?: string, title?: string): void {
-        if (this._view) {
-            let command = 'clearScreen';
-            
-            if (action === 'update') {
-                command = screenType === 'canvas' ? 'updateCanvasScreen' : 'updateTextScreen';
-            } else if (action === 'create') {
-                command = screenType === 'canvas' ? 'createCanvasScreen' : 'createTextScreen';
+        // Update backend state
+        if (action === 'create' || action === 'update') {
+            if (!screenType && !this._screens.has(screenId)) {
+                throw new Error(`Cannot ${action} screen ${screenId}: screenType required for new screens`);
             }
             
-            const message: any = {
-                command: command,
-                screenId: screenId
+            const existingScreen = this._screens.get(screenId);
+            const finalType = screenType || existingScreen?.type || 'text';
+            const finalTitle = title || existingScreen?.title || `${finalType === 'canvas' ? '🎨 Canvas' : '📄 Text'} Screen #${screenId}`;
+            const finalContent = content || existingScreen?.content || '';
+            
+            const screen: VirtualScreen = {
+                id: screenId,
+                type: finalType as 'text' | 'canvas',
+                title: finalTitle,
+                content: finalContent
             };
             
-            if (content !== undefined) {
-                if (screenType === 'canvas') {
-                    message.jsFunction = content;
-                } else {
-                    message.content = content;
-                }
-            }
-            
-            if (title !== undefined) {
-                message.title = title;
-            }
-            
-            this._view.webview.postMessage(message);
-            console.log(`Virtual Screens: ${action} ${screenType || 'screen'} ${screenId}`);
-        } else {
-            console.error('Virtual Screens: Cannot update screen - webview not available');
+            this._screens.set(screenId, screen);
+            console.log(`Virtual Screens: ${action} ${finalType} screen ${screenId} in backend state`);
+        } else if (action === 'clear') {
+            this._screens.delete(screenId);
+            console.log(`Virtual Screens: removed screen ${screenId} from backend state`);
+        }
+        
+        // Sync to webview
+        this._syncToWebview();
+    }
+
+    public readScreen(screenId: number): VirtualScreen | null {
+        return this._screens.get(screenId) || null;
+    }
+
+    public getAllScreens(): VirtualScreen[] {
+        return Array.from(this._screens.values()).sort((a, b) => a.id - b.id);
+    }
+
+    private _syncToWebview(): void {
+        if (this._view) {
+            const screens = this.getAllScreens();
+            this._view.webview.postMessage({
+                command: 'syncScreens',
+                screens: screens
+            });
+            console.log(`Virtual Screens: synced ${screens.length} screens to webview`);
         }
     }
 

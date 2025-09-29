@@ -71,18 +71,18 @@
       {
         "name": "manage_virtual_screens",
         "displayName": "Virtual Screens Management Tool",
-        "modelDescription": "Manage multiple virtual screens for displaying text content, information, lists, code snippets, or any textual data. Each screen is identified by a unique ID (1, 2, 3, etc.) and can be created, updated, or cleared independently. Virtual screens are persistent and remain visible until updated. Use this tool to organize information across multiple screens for better user experience.",
+        "modelDescription": "Manage multiple virtual screens for displaying text content or drawing visualizations. Each screen has a unique ID (1, 2, 3, etc.) and supports two types: 'text' screens for displaying information, lists, code snippets, or any textual data, and 'canvas' screens for creating drawings, charts, diagrams using JavaScript and HTML5 Canvas API. Screens can be created, updated, or cleared independently and are persistent until modified. Use this to organize information across multiple screens for better user experience.",
         "canBeReferencedInPrompt": true,
         "toolReferenceName": "virtual_screens",
         "icon": "$(device-desktop)",
-        "userDescription": "Manage multiple virtual text screens for organized information display",
+        "userDescription": "Manage multiple virtual screens for text content and canvas drawings",
         "inputSchema": {
           "type": "object",
           "properties": {
             "action": {
               "type": "string",
-              "enum": ["update", "create", "clear"],
-              "description": "Action to perform: 'update' to modify existing screen content, 'create' to make a new screen, 'clear' to empty a screen"
+              "enum": ["create", "update", "clear", "read"],
+              "description": "Action to perform: 'create' to make a new screen, 'update' to modify existing screen content, 'clear' to remove a screen, 'read' to get current screen content"
             },
             "screenId": {
               "type": "number",
@@ -95,7 +95,7 @@
             },
             "content": {
               "type": "string",
-              "description": "For text screens: text content to display. For canvas screens: JavaScript code to execute (function body only, like draw_canvas tool). Leave empty or omit for 'clear' action."
+              "description": "For text screens: text content to display with line breaks and formatting. For canvas screens: JavaScript code to execute in canvas context - provide ONLY function body code (e.g., 'ctx.fillStyle = \"blue\"; ctx.fillRect(10, 10, 100, 50);'). The canvas context 'ctx' and canvas object 'canvas' are automatically available. Leave empty or omit for 'clear' action."
             },
             "title": {
               "type": "string",

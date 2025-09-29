@@ -111,18 +111,6 @@ function processData() { return results; }
 **Next meeting**: [Calendar Link](https://calendar.app)
 ```
 
-## Development
-
-Built following the Introduce, Plan, Implement pattern:
-
-### Completed Milestones
-- ✅ **Milestone 1**: Basic extension with activity button and panel
-- ✅ **Milestone 2**: Panel shows proper web page
-- ✅ **Milestone 3**: Canvas with Hello World text
-- ✅ **Milestone 4**: Registered Copilot tool for JavaScript execution
-- ✅ **Milestone 5**: Execute JavaScript in webview canvas
-- ✅ **Milestone 6**: Test and refine with polished UI
-
 ## Repository
 
 - **GitHub**: [rranshous/showoff](https://github.com/rranshous/showoff)

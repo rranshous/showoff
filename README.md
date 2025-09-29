@@ -22,7 +22,9 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
 
 ### Virtual Screens  
 - **Multiple screen types** - Text screens for content, Canvas screens for drawings
+- **Markdown support** - Rich text formatting with headers, bold, italic, code blocks, lists, and links
 - **Dynamic management** - Create, update, read, and remove screens on demand
+- **Animation preservation** - Selective updates maintain canvas animations when other screens change
 - **Organized workspace** - Each screen has unique ID and title for easy reference
 - **Backend state management** - Robust architecture with persistent content storage
 - **Responsive design** - Screens adapt to content with proper overflow handling
@@ -44,12 +46,12 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
 ### Virtual Screens
 1. **Open the Virtual Screens panel** by clicking the desktop icon in the activity bar
 2. **Ask Copilot to manage screens** using natural language or `#virtual_screens`:
-   - "Create a todo list on screen 1"
+   - "Create a **todo list** with `#priorities` on screen 1" (markdown formatting)
    - "Show project status on a new screen"  
    - "Draw a flowchart on canvas screen 2"
    - "Read what's on screen 3"
 3. **Organize information** across multiple persistent screens
-4. **Mix content types** - text screens for lists/info, canvas screens for diagrams
+4. **Mix content types** - text screens with markdown formatting, canvas screens with preserved animations
 
 ## Installation
 
@@ -68,15 +70,45 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
 
 ## Examples
 
-Copilot can draw anything using standard Canvas API methods:
+### Canvas Drawing
+Copilot can create visualizations and animations:
 
 ```javascript
-// Draw a simple chart
-ctx.fillStyle = 'blue';
-ctx.fillRect(50, 100, 30, 100);
-ctx.fillStyle = 'red';
-ctx.fillRect(100, 80, 30, 120);
-ctx.fillText('Sales Data', 50, 50);
+// Animated bouncing ball
+let x = 50, y = 50, dx = 2, dy = 3;
+function animate() {
+  ctx.fillStyle = '#f8f8f8';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'blue';
+  ctx.arc(x, y, 10, 0, Math.PI * 2);
+  ctx.fill();
+  x += dx; y += dy;
+  if (x > canvas.width || x < 0) dx = -dx;
+  if (y > canvas.height || y < 0) dy = -dy;
+  requestAnimationFrame(animate);
+}
+animate();
+```
+
+### Virtual Screens with Markdown
+Rich text formatting in text screens:
+
+```markdown
+# Project Dashboard
+## Current Status: ✅ **On Track**
+
+### 🎯 Goals
+- **Phase 1**: Core features ✅
+- **Phase 2**: *Testing & refinement* 🔄  
+- **Phase 3**: Deployment planning 📋
+
+### 💻 Technical Notes
+```typescript
+// Key implementation detail
+function processData() { return results; }
+```
+
+**Next meeting**: [Calendar Link](https://calendar.app)
 ```
 
 ## Development

@@ -108,6 +108,12 @@
     <script>
         console.log('Window Manager webview loaded successfully!');
         
+        let currentLayout = {
+            gridColumns: 1,
+            gridRows: 1,
+            windows: []
+        };
+        
         // Initialize window manager
         function initializeWindowManager() {
             console.log('Window Manager initialized');
@@ -115,6 +121,118 @@
                 width: window.innerWidth,
                 height: window.innerHeight
             });
+        }
+        
+        // Update layout from extension
+        function updateLayout(layout) {
+            console.log('Updating layout:', layout);
+            currentLayout = layout;
+            
+            const workspace = document.getElementById('windowWorkspace');
+            const placeholder = document.getElementById('placeholder');
+            
+            if (layout.windows.length === 0) {
+                // Show placeholder when no windows
+                workspace.innerHTML = '<div class="placeholder" id="placeholder">No windows active<br><small>Use the window manager tool to create AI-controlled windows</small></div>';
+                workspace.style.gridTemplateColumns = '1fr';
+                workspace.style.gridTemplateRows = '1fr';
+            } else {
+                // Hide placeholder and setup grid
+                if (placeholder) placeholder.remove();
+                
+                // Setup grid
+                workspace.style.gridTemplateColumns = `repeat(${layout.gridColumns}, 1fr)`;
+                workspace.style.gridTemplateRows = `repeat(${layout.gridRows}, 1fr)`;
+                
+                // Clear existing windows
+                workspace.innerHTML = '';
+                
+                // Create windows
+                layout.windows.forEach(window => {
+                    createWindowElement(window, workspace);
+                });
+            }
+        }
+        
+        // Create a window element
+        function createWindowElement(window, container) {
+            const windowFrame = document.createElement('div');
+            windowFrame.className = 'window-frame';
+            windowFrame.id = `window-${window.id}`;
+            
+            // Set grid position
+            const gridRow = window.gridPosition.row + 1; // CSS grid is 1-indexed
+            const gridCol = window.gridPosition.col + 1;
+            const rowSpan = window.gridPosition.rowSpan || 1;
+            const colSpan = window.gridPosition.colSpan || 1;
+            
+            windowFrame.style.gridRow = `${gridRow} / span ${rowSpan}`;
+            windowFrame.style.gridColumn = `${gridCol} / span ${colSpan}`;
+            
+            // Window content
+            windowFrame.innerHTML = `
+                <div class="window-title">${window.title}</div>
+                <div class="window-content" id="content-${window.id}">
+                    ${getWindowContent(window)}
+                </div>
+            `;
+            
+            container.appendChild(windowFrame);
+            
+            // Execute window controller if present
+            if (window.controllerCode) {
+                executeWindowController(window.id, window.controllerCode);
+            }
+        }
+        
+        // Get content based on window type
+        function getWindowContent(window) {
+            switch (window.type) {
+                case 'canvas':
+                    return `<canvas id="canvas-${window.id}" width="300" height="200" style="width: 100%; height: 100%; background: #f8f8f8;"></canvas>`;
+                case 'markup':
+                    return window.content || '<p>Markup window ready...</p>';
+                case 'html':
+                    return window.content || '<div>HTML window ready...</div>';
+                case 'custom':
+                    return '<div id="custom-content-${window.id}">Custom window ready...</div>';
+                default:
+                    return '<div>Unknown window type</div>';
+            }
+        }
+        
+        // Execute window controller agent
+        function executeWindowController(windowId, controllerCode) {
+            try {
+                console.log(`Executing controller for window ${windowId}`);
+                
+                // Create controller function with window context
+                const windowElement = document.getElementById(`window-${windowId}`);
+                const contentElement = document.getElementById(`content-${windowId}`);
+                const canvasElement = document.getElementById(`canvas-${windowId}`);
+                
+                const controllerFunction = new Function(
+                    'windowId', 'windowElement', 'contentElement', 'canvasElement', 'setTitle', 'setContent',
+                    controllerCode
+                );
+                
+                // Helper functions for controller
+                const setTitle = (newTitle) => {
+                    const titleElement = windowElement.querySelector('.window-title');
+                    if (titleElement) titleElement.textContent = newTitle;
+                };
+                
+                const setContent = (newContent) => {
+                    if (contentElement) contentElement.innerHTML = newContent;
+                };
+                
+                // Execute controller
+                controllerFunction(windowId, windowElement, contentElement, canvasElement, setTitle, setContent);
+                
+                console.log(`Controller executed successfully for window ${windowId}`);
+            } catch (error) {
+                console.error(`Error executing controller for window ${windowId}:`, error);
+            }
         }
         
         // Handle window resize
@@ -131,6 +249,9 @@
             console.log('Window Manager received message:', message);
             
             switch (message.command) {
+                case 'updateLayout':
+                    updateLayout(message.layout);
+                    break;
                 case 'test':
                     console.log('Window Manager test message received');
                     break;

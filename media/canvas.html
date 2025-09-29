@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
     <title>ShowOff Canvas</title>
     <style>
         * {
@@ -34,10 +34,26 @@
     </style>
 </head>
 <body>
-    <canvas id="drawingCanvas"></canvas></body>
+    <canvas id="drawingCanvas"></canvas>
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.3.2/dist/pixi.min.js"></script>
     
     <script>
         console.log('ShowOff webview loaded successfully!');
+        
+        // Check animation libraries availability
+        window.addEventListener('load', () => {
+            console.log('GSAP available:', typeof gsap !== 'undefined');
+            console.log('PIXI available:', typeof PIXI !== 'undefined');
+            if (typeof gsap !== 'undefined') {
+                console.log('GSAP version:', gsap.version);
+            }
+            if (typeof PIXI !== 'undefined') {
+                console.log('PIXI version:', PIXI.VERSION);
+            }
+        });
         
         // Initialize responsive canvas
         function initializeCanvas() {

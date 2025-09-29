@@ -1,33 +1,55 @@
-# ShowOff - Visual Copilot Canvas
+# ShowOff - Visual Copilot Workspace
 
-Give Copilot a visual canvas to draw and collaborate! 🎨
+Give Copilot visual canvases and multiple screens to draw, display, and collaborate! 🎨🖥️
 
 <img width="1966" height="803" alt="Screenshot from 2025-09-28 18-35-41" src="https://github.com/user-attachments/assets/7128ee5a-f45c-481e-ab9a-5e65005ec3d5" />
 
-
 ## Overview
 
-ShowOff is a VS Code extension that provides Copilot with a dedicated visual canvas for drawing, charting, and creating visualizations. Instead of being limited to text responses, Copilot can now draw shapes, create diagrams, build charts, and visualize data directly on an interactive HTML5 canvas.
+ShowOff is a VS Code extension that provides Copilot with both a dedicated visual canvas AND multiple virtual screens for comprehensive visual collaboration. Instead of being limited to text responses, Copilot can now:
+
+- Draw shapes, charts, and diagrams on a full-screen canvas  
+- Create and manage multiple virtual screens (text and canvas types)
+- Organize information across multiple persistent displays
+- Read back content from screens for continued collaboration
 
 ## Features
 
+### Canvas Drawing
 - **Full-screen canvas** that fills the entire panel and automatically resizes
 - **Real-time drawing** - Copilot executes JavaScript directly on the canvas
-- **Seamless integration** - Works with both `#draw_canvas` references and automatic agent mode
 - **Persistent canvas** - Drawings remain visible as you continue your conversation
-- **Error handling** - Clear error messages displayed on canvas when code fails
+
+### Virtual Screens  
+- **Multiple screen types** - Text screens for content, Canvas screens for drawings
+- **Dynamic management** - Create, update, read, and remove screens on demand
+- **Organized workspace** - Each screen has unique ID and title for easy reference
+- **Backend state management** - Robust architecture with persistent content storage
+- **Responsive design** - Screens adapt to content with proper overflow handling
+
+### Integration
+- **Seamless Copilot integration** - Works with tool references and automatic agent mode
+- **Error handling** - Clear error messages and graceful failure handling  
 - **VS Code theme integration** - Clean, professional UI that matches your editor
 
 ## How It Works
 
-1. **Open the ShowOff panel** by clicking the canvas icon in the activity bar
-2. **Ask Copilot to draw something** using natural language:
+### Canvas Drawing
+1. **Open the ShowOff panel** by clicking the canvas icon in the activity bar  
+2. **Ask Copilot to draw** using natural language or `#draw_canvas`:
    - "Draw a red circle"
    - "Create a bar chart showing sales data"
    - "Visualize a binary tree"
-   - "Make a flowchart for the login process"
-3. **Reference explicitly** with `#draw_canvas` or let agent mode automatically use it
-4. **Watch Copilot create** real-time visualizations using JavaScript and HTML5 Canvas API
+
+### Virtual Screens
+1. **Open the Virtual Screens panel** by clicking the desktop icon in the activity bar
+2. **Ask Copilot to manage screens** using natural language or `#virtual_screens`:
+   - "Create a todo list on screen 1"
+   - "Show project status on a new screen"  
+   - "Draw a flowchart on canvas screen 2"
+   - "Read what's on screen 3"
+3. **Organize information** across multiple persistent screens
+4. **Mix content types** - text screens for lists/info, canvas screens for diagrams
 
 ## Installation
 

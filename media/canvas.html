@@ -43,6 +43,10 @@
     <script>
         console.log('ShowOff webview loaded successfully!');
         
+        // State management for persistence
+        let lastExecutedJS = null;
+        let hasContent = false;
+        
         // Check animation libraries availability
         window.addEventListener('load', () => {
             console.log('GSAP available:', typeof gsap !== 'undefined');
@@ -69,15 +73,21 @@
                 canvas.width = rect.width;
                 canvas.height = rect.height;
                 
-                const ctx = canvas.getContext('2d');
-                // Set light background for better text visibility
-                ctx.fillStyle = '#f8f8f8';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw placeholder text
-                drawPlaceholder(ctx, canvas);
-                
                 console.log(`Canvas resized to ${canvas.width}x${canvas.height}`);
+                
+                // Re-execute stored JavaScript if we have content, otherwise show placeholder
+                if (hasContent && lastExecutedJS) {
+                    console.log('Re-executing stored JavaScript after resize');
+                    executeJavaScript(lastExecutedJS);
+                } else {
+                    const ctx = canvas.getContext('2d');
+                    // Set light background for better text visibility
+                    ctx.fillStyle = '#f8f8f8';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw placeholder text
+                    drawPlaceholder(ctx, canvas);
+                }
             }
             
             // Function to draw placeholder text
@@ -129,6 +139,10 @@
         // Function to safely execute JavaScript on the canvas
         function executeJavaScript(jsFunction) {
             console.log('Executing JavaScript on canvas:', jsFunction);
+            
+            // Store the executed JS for persistence and resize re-execution
+            lastExecutedJS = jsFunction;
+            hasContent = true;
             
             try {
                 // CLEANUP: Try to kill any existing GSAP animations

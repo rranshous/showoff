@@ -121,35 +121,52 @@
             
             switch (message.command) {
                 case 'executeJS':
-                    executeCanvasJavaScript(message.jsFunction);
+                    executeJavaScript(message.jsFunction);
                     break;
             }
         });
 
         // Function to safely execute JavaScript on the canvas
-        function executeCanvasJavaScript(jsFunction) {
-            const canvas = document.getElementById('drawingCanvas');
-            if (!canvas) {
-                console.error('Canvas not found!');
-                return;
-            }
-            
-            const ctx = canvas.getContext('2d');
+        function executeJavaScript(jsFunction) {
+            console.log('Executing JavaScript on canvas:', jsFunction);
             
             try {
-                console.log('Executing JavaScript on canvas:', jsFunction);
+                // CLEANUP: Try to kill any existing GSAP animations
+                if (window.gsap) {
+                    gsap.killTweensOf("*");
+                    console.log('Killed existing GSAP animations');
+                }
                 
-                // Set light background before drawing (removes placeholder)
+                // HARD RESET: Recreate canvas to stop any persistent animations/contexts
+                const oldCanvas = document.getElementById('drawingCanvas');
+                const newCanvas = document.createElement('canvas');
+                newCanvas.id = 'drawingCanvas';
+                
+                // Copy dimensions and styling
+                newCanvas.width = oldCanvas.width;
+                newCanvas.height = oldCanvas.height;
+                newCanvas.className = oldCanvas.className;
+                
+                // Replace in DOM
+                oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
+                
+                // Update global references
+                canvas = newCanvas;
+                ctx = canvas.getContext('2d');
+                
+                // Set light background
                 ctx.fillStyle = '#f8f8f8';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
+                console.log('Canvas recreated - all previous animations/contexts cleared');
+                
                 // Create a function that provides the canvas context
-                const userFunction = new Function('ctx', 'canvas', jsFunction);
+                const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', jsFunction);
                 
-                // Execute the user's function with canvas context
-                userFunction(ctx, canvas);
+                // Execute the user's JavaScript with canvas context and libraries
+                userFunction(ctx, canvas, window.gsap, window.PIXI);
                 
-                console.log('JavaScript executed successfully on canvas');
+                console.log('JavaScript executed successfully on new canvas');
             } catch (error) {
                 console.error('Error executing JavaScript on canvas:', error);
                 
@@ -160,7 +177,30 @@
                 ctx.font = '14px Arial, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
-                ctx.fillText('Error executing JS: ' + error.message, 10, 10);
+                
+                const errorMessage = `Error: ${error.message}`;
+                ctx.fillText(errorMessage, 10, 10);
+                
+                // Break long error messages into multiple lines
+                if (errorMessage.length > 50) {
+                    const words = errorMessage.split(' ');
+                    let line = '';
+                    let y = 30;
+                    
+                    for (let word of words) {
+                        const testLine = line + word + ' ';
+                        const metrics = ctx.measureText(testLine);
+                        
+                        if (metrics.width > canvas.width - 20 && line !== '') {
+                            ctx.fillText(line, 10, y);
+                            line = word + ' ';
+                            y += 20;
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    ctx.fillText(line, 10, y);
+                }
             }
         }
         

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
     <title>Virtual Screens</title>
     <style>
         * {
@@ -272,8 +272,8 @@
                                         ctx.fillRect(0, 0, canvas.width, canvas.height);
                                         
                                         // Execute the JavaScript function
-                                        const userFunction = new Function('ctx', 'canvas', screen.content);
-                                        userFunction(ctx, canvas);
+                                        const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', 'MotionPathPlugin', 'Draggable', screen.content);
+                                        userFunction(ctx, canvas, window.gsap, window.PIXI, window.MotionPathPlugin, window.Draggable);
                                     } catch (error) {
                                         console.error(`Error rendering canvas screen ${screen.id}:`, error);
                                         ctx.fillStyle = '#f8f8f8';
@@ -348,8 +348,8 @@
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
                         
                         // Execute the JavaScript function
-                        const userFunction = new Function('ctx', 'canvas', screen.content);
-                        userFunction(ctx, canvas);
+                        const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', 'MotionPathPlugin', 'Draggable', screen.content);
+                        userFunction(ctx, canvas, window.gsap, window.PIXI, window.MotionPathPlugin, window.Draggable);
                     } catch (error) {
                         console.error(`Error updating canvas screen ${screen.id}:`, error);
                         ctx.fillStyle = '#f8f8f8';
@@ -400,8 +400,8 @@
                             try {
                                 ctx.fillStyle = '#f8f8f8';
                                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                                const userFunction = new Function('ctx', 'canvas', screen.content);
-                                userFunction(ctx, canvas);
+                                const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', 'MotionPathPlugin', 'Draggable', screen.content);
+                                userFunction(ctx, canvas, window.gsap, window.PIXI, window.MotionPathPlugin, window.Draggable);
                             } catch (error) {
                                 console.error(`Error creating canvas screen ${screen.id}:`, error);
                                 ctx.fillStyle = '#f8f8f8';
@@ -468,6 +468,36 @@
             const vscode = acquireVsCodeApi();
             vscode.postMessage({ command: 'webview-ready' });
         }
+    </script>
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.3.2/dist/pixi.min.js"></script>
+    
+    <script>
+        // Check animation libraries availability and register plugins
+        window.addEventListener('load', () => {
+            console.log('Virtual Screens: GSAP available:', typeof gsap !== 'undefined');
+            console.log('Virtual Screens: PIXI available:', typeof PIXI !== 'undefined');
+            if (typeof gsap !== 'undefined') {
+                console.log('Virtual Screens: GSAP version:', gsap.version);
+                
+                // Register GSAP plugins
+                if (typeof MotionPathPlugin !== 'undefined') {
+                    gsap.registerPlugin(MotionPathPlugin);
+                    console.log('Virtual Screens: GSAP MotionPathPlugin registered');
+                }
+                if (typeof Draggable !== 'undefined') {
+                    gsap.registerPlugin(Draggable);
+                    console.log('Virtual Screens: GSAP Draggable plugin registered');
+                }
+            }
+            if (typeof PIXI !== 'undefined') {
+                console.log('Virtual Screens: PIXI version:', PIXI.VERSION);
+            }
+        });
     </script>
 </body>
 </html>

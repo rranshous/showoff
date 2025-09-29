@@ -41,13 +41,16 @@ export class VirtualScreensProvider implements vscode.WebviewViewProvider {
             
             this._screens.set(screenId, screen);
             console.log(`Virtual Screens: ${action} ${finalType} screen ${screenId} in backend state`);
+            
+            // Send selective update to preserve other screen animations
+            this._updateSingleScreen(screen);
         } else if (action === 'clear') {
             this._screens.delete(screenId);
             console.log(`Virtual Screens: removed screen ${screenId} from backend state`);
+            
+            // Send selective removal
+            this._removeSingleScreen(screenId);
         }
-        
-        // Sync to webview
-        this._syncToWebview();
     }
 
     public readScreen(screenId: number): VirtualScreen | null {
@@ -66,6 +69,26 @@ export class VirtualScreensProvider implements vscode.WebviewViewProvider {
                 screens: screens
             });
             console.log(`Virtual Screens: synced ${screens.length} screens to webview`);
+        }
+    }
+
+    private _updateSingleScreen(screen: VirtualScreen): void {
+        if (this._view) {
+            this._view.webview.postMessage({
+                command: 'updateSingleScreen',
+                screen: screen
+            });
+            console.log(`Virtual Screens: sent single update for screen ${screen.id}`);
+        }
+    }
+
+    private _removeSingleScreen(screenId: number): void {
+        if (this._view) {
+            this._view.webview.postMessage({
+                command: 'removeSingleScreen',
+                screenId: screenId
+            });
+            console.log(`Virtual Screens: sent removal for screen ${screenId}`);
         }
     }
 
@@ -93,6 +116,8 @@ export class VirtualScreensProvider implements vscode.WebviewViewProvider {
                 switch (message.command) {
                     case 'webview-ready':
                         console.log('Virtual Screens webview is ready!');
+                        // Send initial sync when webview is ready
+                        this._syncToWebview();
                         return;
                 }
             },

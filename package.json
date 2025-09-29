@@ -95,7 +95,7 @@
             },
             "content": {
               "type": "string",
-              "description": "For text screens: text content to display with line breaks and formatting. For canvas screens: JavaScript code to execute in canvas context - provide ONLY function body code (e.g., 'ctx.fillStyle = \"blue\"; ctx.fillRect(10, 10, 100, 50);'). For animations, use requestAnimationFrame loops: 'function animate() { /* drawing code */ requestAnimationFrame(animate); } animate();'. The canvas context 'ctx' and canvas object 'canvas' are automatically available. Leave empty or omit for 'clear' action."
+              "description": "For text screens: text content to display with markdown formatting support (headers, bold, italic, code, lists, links). For canvas screens: JavaScript code to execute in canvas context - provide ONLY function body code (e.g., 'ctx.fillStyle = \"blue\"; ctx.fillRect(10, 10, 100, 50);'). For animations, use requestAnimationFrame loops: 'function animate() { /* drawing code */ requestAnimationFrame(animate); } animate();'. The canvas context 'ctx' and canvas object 'canvas' are automatically available. Leave empty or omit for 'clear' action."
             },
             "title": {
               "type": "string",

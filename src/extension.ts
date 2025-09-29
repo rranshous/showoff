@@ -8,8 +8,8 @@ interface DrawCanvasInput {
 }
 
 interface VirtualScreensInput {
-    action: 'create' | 'update' | 'clear' | 'read';
-    screenId: number;
+    action: 'create' | 'update' | 'clear' | 'read' | 'list';
+    screenId?: number;
     screenType?: 'text' | 'canvas';
     content?: string;
     title?: string;
@@ -71,6 +71,20 @@ export function activate(context: vscode.ExtensionContext) {
             try {
                 const { action, screenId, screenType, content, title } = options.input;
                 
+                if (action === 'list') {
+                    const screens = screensProvider.getAllScreens();
+                    const screenList = screens.map(s => `Screen ${s.id} (${s.type}): "${s.title}"`).join(', ');
+                    return new vscode.LanguageModelToolResult([
+                        new vscode.LanguageModelTextPart(`Current screens: ${screenList || 'No screens active'}`)
+                    ]);
+                }
+                
+                if (!screenId) {
+                    return new vscode.LanguageModelToolResult([
+                        new vscode.LanguageModelTextPart(`Error: screenId is required for ${action} action`)
+                    ]);
+                }
+                
                 if (action === 'read') {
                     const screen = screensProvider.readScreen(screenId);
                     if (screen) {
@@ -87,24 +101,32 @@ export function activate(context: vscode.ExtensionContext) {
                     }
                 } else {
                     // Handle create/update/clear actions
-                    screensProvider.updateScreen(action, screenId, screenType, content, title);
-                    
-                    let actionDescription = '';
-                    switch (action) {
-                        case 'create':
-                            actionDescription = `Created screen ${screenId}${title ? ` titled "${title}"` : ''}`;
-                            break;
-                        case 'update':
-                            actionDescription = `Updated screen ${screenId} with new content`;
-                            break;
-                        case 'clear':
-                            actionDescription = `Removed screen ${screenId}`;
-                            break;
+                    if (action === 'update' && !content && !title) {
+                        // If update with no content/title, clear the screen
+                        screensProvider.updateScreen('clear', screenId, screenType, content, title);
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Virtual Screens: Cleared screen ${screenId} (no content provided for update).`)
+                        ]);
+                    } else {
+                        screensProvider.updateScreen(action, screenId, screenType, content, title);
+                        
+                        let actionDescription = '';
+                        switch (action) {
+                            case 'create':
+                                actionDescription = `Created screen ${screenId}${title ? ` titled "${title}"` : ''}`;
+                                break;
+                            case 'update':
+                                actionDescription = `Updated screen ${screenId} with new content`;
+                                break;
+                            case 'clear':
+                                actionDescription = `Removed screen ${screenId}`;
+                                break;
+                        }
+                        
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Virtual Screens: ${actionDescription}. Content has been updated in the virtual screens panel.`)
+                        ]);
                     }
-                    
-                    return new vscode.LanguageModelToolResult([
-                        new vscode.LanguageModelTextPart(`Virtual Screens: ${actionDescription}. Content has been updated in the virtual screens panel.`)
-                    ]);
                 }
             } catch (error) {
                 console.error('Virtual Screens: Error managing screen:', error);

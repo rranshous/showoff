@@ -62,7 +62,7 @@
           "properties": {
             "jsFunction": {
               "type": "string",
-              "description": "JavaScript code to execute in the canvas context. Provide ONLY the function body code, NOT a named function declaration. Available: HTML5 Canvas API (ctx, canvas), GSAP animation library with plugins (gsap, MotionPathPlugin, Draggable), and PIXI.js WebGL renderer (PIXI). ALWAYS USE GSAP FOR ANIMATIONS - avoid manual requestAnimationFrame loops. For complex motion: use MotionPathPlugin. For user interaction: use Draggable. Recommended pattern: GSAP animates properties, onUpdate renders to canvas/PIXI. Examples: Canvas Animation: 'gsap.to(ball, {x:200, duration:2, onUpdate:()=>{ctx.clearRect(0,0,canvas.width,canvas.height); ctx.arc(ball.x,ball.y,20,0,Math.PI*2); ctx.fill();}});' | Motion Path: 'gsap.to(obj, {motionPath: {path: \"M10,10 Q100,50 200,10\"}, onUpdate: render});' | Draggable: 'Draggable.create(element, {onDrag: updateCanvas});' | PIXI Hybrid: 'const app=new PIXI.Application({view:canvas}); gsap.to(sprite, {x:100, onUpdate:()=>app.render()});'"
+              "description": "JavaScript code to execute in the canvas context. Provide ONLY the function body code, NOT a named function declaration. Available: HTML5 Canvas API (ctx, canvas), GSAP animation library with plugins (gsap, MotionPathPlugin, Draggable), and PIXI.js renderer (PIXI - NOTE: WebGL not supported in VS Code browser, use Canvas fallback). ALWAYS USE GSAP FOR ANIMATIONS - avoid manual requestAnimationFrame loops. For complex motion: use MotionPathPlugin. For user interaction: use Draggable. Recommended pattern: GSAP animates properties, onUpdate renders to canvas/PIXI. Examples: Canvas Animation: 'gsap.to(ball, {x:200, duration:2, onUpdate:()=>{ctx.clearRect(0,0,canvas.width,canvas.height); ctx.arc(ball.x,ball.y,20,0,Math.PI*2); ctx.fill();}});' | Motion Path: 'gsap.to(obj, {motionPath: {path: \"M10,10 Q100,50 200,10\"}, onUpdate: render});' | Draggable: 'Draggable.create(element, {onDrag: updateCanvas});' | PIXI Canvas: 'const app=new PIXI.Application({view:canvas, forceCanvas:true}); gsap.to(sprite, {x:100, onUpdate:()=>app.render()});'"
             }
           },
           "required": ["jsFunction"]
@@ -81,12 +81,12 @@
           "properties": {
             "action": {
               "type": "string",
-              "enum": ["create", "update", "clear", "read"],
-              "description": "Action to perform: 'create' to make a new screen, 'update' to modify existing screen content, 'clear' to remove a screen, 'read' to get current screen content"
+              "enum": ["create", "update", "clear", "read", "list"],
+              "description": "Action to perform: 'create' to make a new screen, 'update' to modify existing screen content, 'clear' to remove a screen, 'read' to get current screen content, 'list' to get details of all current screens"
             },
             "screenId": {
               "type": "number",
-              "description": "Numeric ID of the screen to manage (1, 2, 3, etc.). Use consistent IDs to reference the same screen across operations."
+              "description": "Numeric ID of the screen to manage (1, 2, 3, etc.). Use consistent IDs to reference the same screen across operations. Not required for 'list' action."
             },
             "screenType": {
               "type": "string",
@@ -95,14 +95,14 @@
             },
             "content": {
               "type": "string",
-              "description": "For text screens: text content to display with markdown formatting support (headers, bold, italic, code, lists, links). For canvas screens: JavaScript code to execute in canvas context with GSAP and PIXI.js support - provide ONLY function body code (e.g., 'ctx.fillStyle = \"blue\"; ctx.fillRect(10, 10, 100, 50);'). Available: HTML5 Canvas API (ctx, canvas), GSAP animation library with plugins (gsap, MotionPathPlugin, Draggable), and PIXI.js WebGL renderer (PIXI). PREFER GSAP for animations with onUpdate callbacks. Examples: 'gsap.to(obj, {x:100, onUpdate:()=>redraw()});' | 'const app=new PIXI.Application({view:canvas});'. Leave empty or omit for 'clear' action."
+              "description": "For text screens: text content to display with markdown formatting support (headers, bold, italic, code, lists, links). For canvas screens: JavaScript code to execute in canvas context with GSAP and PIXI.js support - provide ONLY function body code (e.g., 'ctx.fillStyle = \"blue\"; ctx.fillRect(10, 10, 100, 50);'). Available: HTML5 Canvas API (ctx, canvas), GSAP animation library with plugins (gsap, MotionPathPlugin, Draggable), and PIXI.js renderer (PIXI - NOTE: WebGL not supported in VS Code browser, use forceCanvas:true). PREFER GSAP for animations with onUpdate callbacks. Examples: 'gsap.to(obj, {x:100, onUpdate:()=>redraw()});' | 'const app=new PIXI.Application({view:canvas, forceCanvas:true});'. Leave empty or omit for 'clear' action."
             },
             "title": {
               "type": "string",
               "description": "Optional title for the screen when creating new screens. If not provided, defaults to 'Screen #X'"
             }
           },
-          "required": ["action", "screenId"]
+          "required": ["action"]
         }
       }
     ]

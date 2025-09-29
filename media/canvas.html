@@ -38,6 +38,8 @@
     
     <!-- Animation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.3.2/dist/pixi.min.js"></script>
     
     <script>
@@ -53,6 +55,16 @@
             console.log('PIXI available:', typeof PIXI !== 'undefined');
             if (typeof gsap !== 'undefined') {
                 console.log('GSAP version:', gsap.version);
+                
+                // Register GSAP plugins
+                if (typeof MotionPathPlugin !== 'undefined') {
+                    gsap.registerPlugin(MotionPathPlugin);
+                    console.log('GSAP MotionPathPlugin registered');
+                }
+                if (typeof Draggable !== 'undefined') {
+                    gsap.registerPlugin(Draggable);
+                    console.log('GSAP Draggable plugin registered');
+                }
             }
             if (typeof PIXI !== 'undefined') {
                 console.log('PIXI version:', PIXI.VERSION);
@@ -175,10 +187,10 @@
                 console.log('Canvas recreated - all previous animations/contexts cleared');
                 
                 // Create a function that provides the canvas context
-                const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', jsFunction);
+                const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', 'MotionPathPlugin', 'Draggable', jsFunction);
                 
                 // Execute the user's JavaScript with canvas context and libraries
-                userFunction(ctx, canvas, window.gsap, window.PIXI);
+                userFunction(ctx, canvas, window.gsap, window.PIXI, window.MotionPathPlugin, window.Draggable);
                 
                 console.log('JavaScript executed successfully on new canvas');
             } catch (error) {

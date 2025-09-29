@@ -26,6 +26,14 @@
           "name": "Virtual Screens",
           "icon": "$(device-desktop)"
         }
+      ],
+      "windowmanager-sidebar": [
+        {
+          "type": "webview",
+          "id": "windowmanager.managerView",
+          "name": "Window Manager",
+          "icon": "$(window)"
+        }
       ]
     },
     "viewsContainers": {
@@ -39,6 +47,11 @@
           "id": "virtualscreens-sidebar",
           "title": "Virtual Screens",
           "icon": "$(device-desktop)"
+        },
+        {
+          "id": "windowmanager-sidebar",
+          "title": "Window Manager",
+          "icon": "$(window)"
         }
       ]
     },

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval';">
+    <title>Window Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--vscode-font-family);
+            background-color: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .window-manager-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background-color: var(--vscode-panel-background);
+            border: 1px solid var(--vscode-panel-border);
+        }
+        
+        .header {
+            background-color: var(--vscode-titleBar-activeBackground);
+            color: var(--vscode-titleBar-activeForeground);
+            padding: 8px 12px;
+            font-size: 0.9em;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            flex-shrink: 0;
+        }
+        
+        .window-workspace {
+            flex: 1;
+            background-color: var(--vscode-editor-background);
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+            gap: 2px;
+            padding: 2px;
+        }
+        
+        .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--vscode-descriptionForeground);
+            font-size: 1.1em;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .window-frame {
+            background-color: var(--vscode-input-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .window-title {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            padding: 4px 8px;
+            font-size: 0.8em;
+            font-weight: 500;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            flex-shrink: 0;
+        }
+        
+        .window-content {
+            flex: 1;
+            padding: 8px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-manager-container">
+        <div class="header">
+            🪟 Window Manager - AI-Controlled Desktop Environment
+        </div>
+        
+        <div class="window-workspace" id="windowWorkspace">
+            <div class="placeholder" id="placeholder">
+                No windows active<br>
+                <small>Use the window manager tool to create AI-controlled windows</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Window Manager webview loaded successfully!');
+        
+        // Initialize window manager
+        function initializeWindowManager() {
+            console.log('Window Manager initialized');
+            console.log('Container dimensions:', {
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            console.log('Window Manager resized:', {
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        });
+        
+        // Message handling from extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            console.log('Window Manager received message:', message);
+            
+            switch (message.command) {
+                case 'test':
+                    console.log('Window Manager test message received');
+                    break;
+            }
+        });
+        
+        // Initialize when loaded
+        document.addEventListener('DOMContentLoaded', initializeWindowManager);
+        if (document.readyState !== 'loading') {
+            initializeWindowManager();
+        }
+        
+        // Send ready signal to extension
+        if (typeof acquireVsCodeApi !== 'undefined') {
+            const vscode = acquireVsCodeApi();
+            vscode.postMessage({ command: 'webview-ready' });
+        }
+    </script>
+</body>
+</html>

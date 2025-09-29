@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { ShowOffCanvasProvider } from './canvasProvider';
 import { VirtualScreensProvider } from './virtualScreensProvider';
+import { WindowManagerProvider } from './windowManagerProvider';
 
 // Interface for our tool inputs
 interface DrawCanvasInput {
@@ -21,10 +22,12 @@ export function activate(context: vscode.ExtensionContext) {
     // Register the webview providers
     const canvasProvider = new ShowOffCanvasProvider(context.extensionUri);
     const screensProvider = new VirtualScreensProvider(context.extensionUri);
+    const windowManagerProvider = new WindowManagerProvider(context.extensionUri);
     
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('showoff.canvasView', canvasProvider),
-        vscode.window.registerWebviewViewProvider('virtualscreens.screensView', screensProvider)
+        vscode.window.registerWebviewViewProvider('virtualscreens.screensView', screensProvider),
+        vscode.window.registerWebviewViewProvider('windowmanager.managerView', windowManagerProvider)
     );
 
     // Register the show canvas command

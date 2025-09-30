@@ -117,6 +117,70 @@
           },
           "required": ["action"]
         }
+      },
+      {
+        "name": "manage_window_system",
+        "displayName": "Window Manager System Tool",
+        "modelDescription": "Manage a sophisticated window system with grid-based layouts and JavaScript Window Controller Agents (WCAs). Create, update, and destroy windows with custom positioning, sizes, and behavior. Deploy Window Controller Agents - JavaScript code that controls window content, title, and rendering. Supports multiple window types: canvas, markup, html, custom. Each window has grid coordinates (row, col, rowSpan, colSpan) for precise positioning. Layout management with configurable grid dimensions. Query system state and window information.",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "window_system",
+        "icon": "$(window)",
+        "userDescription": "Manage windows, layouts, and deploy JavaScript Window Controller Agents",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": ["create", "update", "destroy", "layout", "query", "communicate"],
+              "description": "Action to perform: 'layout' to set grid dimensions, 'create' to make new window, 'update' to modify existing window, 'destroy' to remove window, 'query' to get window/layout info, 'communicate' for future WCA interaction"
+            },
+            "windowId": {
+              "type": "string",
+              "description": "Unique identifier for the window (e.g., 'main', 'sidebar', 'chart1'). Required for create, update, destroy, query actions on specific windows."
+            },
+            "windowTitle": {
+              "type": "string",
+              "description": "Display title for the window header. Required for create action, optional for update."
+            },
+            "windowType": {
+              "type": "string",
+              "enum": ["canvas", "markup", "html", "custom"],
+              "description": "Window content type: 'canvas' for HTML5 canvas with drawing, 'markup' for text/markdown content, 'html' for custom HTML, 'custom' for controller-managed content. Required for create action."
+            },
+            "gridPosition": {
+              "type": "object",
+              "properties": {
+                "row": {"type": "number", "description": "Grid row position (0-based)"},
+                "col": {"type": "number", "description": "Grid column position (0-based)"},
+                "rowSpan": {"type": "number", "description": "Number of rows to span (default 1)"},
+                "colSpan": {"type": "number", "description": "Number of columns to span (default 1)"}
+              },
+              "required": ["row", "col"],
+              "description": "Window position and size in grid coordinates. Required for create action."
+            },
+            "controllerCode": {
+              "type": "string",
+              "description": "JavaScript Window Controller Agent (WCA) code to control window behavior. Gets access to windowId, windowElement, contentElement, canvasElement (if canvas type), setTitle(), setContent() functions. Example: 'setTitle(\"Dynamic Title\"); setContent(\"<h1>Hello</h1>\"); if(canvasElement) { const ctx = canvasElement.getContext(\"2d\"); ctx.fillRect(0,0,100,100); }'. Use for dynamic content updates, animations, interactions."
+            },
+            "content": {
+              "type": "string",
+              "description": "Static content for the window (markup/html types). For dynamic content, use controllerCode instead."
+            },
+            "layoutConfig": {
+              "type": "object",
+              "properties": {
+                "gridColumns": {"type": "number", "description": "Number of columns in the grid"},
+                "gridRows": {"type": "number", "description": "Number of rows in the grid"}
+              },
+              "required": ["gridColumns", "gridRows"],
+              "description": "Grid layout configuration. Required for layout action."
+            },
+            "communicationData": {
+              "description": "Data for future WCA communication features"
+            }
+          },
+          "required": ["action"]
+        }
       }
     ]
   },

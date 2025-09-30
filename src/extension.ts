@@ -16,6 +16,26 @@ interface VirtualScreensInput {
     title?: string;
 }
 
+interface WindowManagerInput {
+    action: 'create' | 'update' | 'destroy' | 'layout' | 'query' | 'communicate';
+    windowId?: string;
+    windowTitle?: string;
+    windowType?: 'canvas' | 'markup' | 'html' | 'custom';
+    gridPosition?: {
+        row: number;
+        col: number;
+        rowSpan?: number;
+        colSpan?: number;
+    };
+    controllerCode?: string;
+    content?: string;
+    layoutConfig?: {
+        gridColumns: number;
+        gridRows: number;
+    };
+    communicationData?: any;
+}
+
 export function activate(context: vscode.ExtensionContext) {
     console.log('ShowOff extension is now active!');
 
@@ -147,13 +167,156 @@ export function activate(context: vscode.ExtensionContext) {
         }
     };
 
+    // Register the window manager tool for controlling windows and layouts
+    const windowManagerTool: vscode.LanguageModelTool<WindowManagerInput> = {
+        invoke: async (options: vscode.LanguageModelToolInvocationOptions<WindowManagerInput>, token: vscode.CancellationToken) => {
+            console.log('Window Manager: Tool invoked!');
+            console.log('Window Manager: Action:', options.input.action, 'Window:', options.input.windowId);
+            
+            try {
+                const { action, windowId, windowTitle, windowType, gridPosition, controllerCode, content, layoutConfig, communicationData } = options.input;
+                
+                switch (action) {
+                    case 'layout':
+                        if (!layoutConfig) {
+                            return new vscode.LanguageModelToolResult([
+                                new vscode.LanguageModelTextPart(`Error: layoutConfig is required for layout action`)
+                            ]);
+                        }
+                        
+                        const newLayout = {
+                            gridColumns: layoutConfig.gridColumns,
+                            gridRows: layoutConfig.gridRows,
+                            windows: windowManagerProvider.getLayout().windows
+                        };
+                        
+                        windowManagerProvider.updateLayout(newLayout);
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Window Manager: Updated layout to ${layoutConfig.gridColumns}x${layoutConfig.gridRows} grid`)
+                        ]);
+                    
+                    case 'create':
+                        if (!windowId || !windowTitle || !windowType || !gridPosition) {
+                            return new vscode.LanguageModelToolResult([
+                                new vscode.LanguageModelTextPart(`Error: windowId, windowTitle, windowType, and gridPosition are required for create action`)
+                            ]);
+                        }
+                        
+                        const newWindow = {
+                            id: windowId,
+                            title: windowTitle,
+                            type: windowType,
+                            content: content || '',
+                            controllerCode: controllerCode,
+                            gridPosition: gridPosition
+                        };
+                        
+                        windowManagerProvider.createWindow(newWindow);
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Window Manager: Created ${windowType} window "${windowTitle}" (${windowId}) at position ${gridPosition.row},${gridPosition.col}${controllerCode ? ' with controller agent' : ''}`)
+                        ]);
+                    
+                    case 'update':
+                        if (!windowId) {
+                            return new vscode.LanguageModelToolResult([
+                                new vscode.LanguageModelTextPart(`Error: windowId is required for update action`)
+                            ]);
+                        }
+                        
+                        const currentLayout = windowManagerProvider.getLayout();
+                        const existingWindow = currentLayout.windows.find(w => w.id === windowId);
+                        
+                        if (!existingWindow) {
+                            return new vscode.LanguageModelToolResult([
+                                new vscode.LanguageModelTextPart(`Error: Window ${windowId} does not exist`)
+                            ]);
+                        }
+                        
+                        const updatedWindow = {
+                            ...existingWindow,
+                            ...(windowTitle && { title: windowTitle }),
+                            ...(windowType && { type: windowType }),
+                            ...(content !== undefined && { content: content }),
+                            ...(controllerCode !== undefined && { controllerCode: controllerCode }),
+                            ...(gridPosition && { gridPosition: gridPosition })
+                        };
+                        
+                        windowManagerProvider.createWindow(updatedWindow); // createWindow handles updates
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Window Manager: Updated window ${windowId}`)
+                        ]);
+                    
+                    case 'destroy':
+                        if (!windowId) {
+                            return new vscode.LanguageModelToolResult([
+                                new vscode.LanguageModelTextPart(`Error: windowId is required for destroy action`)
+                            ]);
+                        }
+                        
+                        windowManagerProvider.destroyWindow(windowId);
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Window Manager: Destroyed window ${windowId}`)
+                        ]);
+                    
+                    case 'query':
+                        if (windowId) {
+                            const layout = windowManagerProvider.getLayout();
+                            const window = layout.windows.find(w => w.id === windowId);
+                            if (window) {
+                                return new vscode.LanguageModelToolResult([
+                                    new vscode.LanguageModelTextPart(`Window ${windowId}: "${window.title}" (${window.type}) at ${window.gridPosition.row},${window.gridPosition.col}${window.controllerCode ? ' [has controller]' : ''}`)
+                                ]);
+                            } else {
+                                return new vscode.LanguageModelToolResult([
+                                    new vscode.LanguageModelTextPart(`Window ${windowId} does not exist`)
+                                ]);
+                            }
+                        } else {
+                            const layout = windowManagerProvider.getLayout();
+                            const windowList = layout.windows.map(w => 
+                                `${w.id}: "${w.title}" (${w.type}) at ${w.gridPosition.row},${w.gridPosition.col}`
+                            ).join(', ');
+                            return new vscode.LanguageModelToolResult([
+                                new vscode.LanguageModelTextPart(`Current layout: ${layout.gridColumns}x${layout.gridRows} grid. Windows: ${windowList || 'None'}`)
+                            ]);
+                        }
+                    
+                    case 'communicate':
+                        // For future implementation - bidirectional communication with WCAs
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Window Manager: Communication action not yet implemented`)
+                        ]);
+                    
+                    default:
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(`Error: Unknown action "${action}"`)
+                        ]);
+                }
+            } catch (error) {
+                console.error('Window Manager: Error managing windows:', error);
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(`Error managing windows: ${error}`)
+                ]);
+            }
+        },
+        
+        prepareInvocation: async (options, token) => {
+            const { action, windowId, windowTitle } = options.input;
+            return {
+                invocationMessage: `Managing window system: ${action}${windowId ? ` ${windowId}` : ''}${windowTitle ? ` "${windowTitle}"` : ''}`
+            };
+        }
+    };
+
     // Register the tools with VS Code
     const canvasToolRegistration = vscode.lm.registerTool('draw_canvas', drawCanvasTool);
     const screensToolRegistration = vscode.lm.registerTool('manage_virtual_screens', virtualScreensTool);
-    context.subscriptions.push(canvasToolRegistration, screensToolRegistration);
+    const windowManagerToolRegistration = vscode.lm.registerTool('manage_window_system', windowManagerTool);
+    context.subscriptions.push(canvasToolRegistration, screensToolRegistration, windowManagerToolRegistration);
     
     console.log('ShowOff: Canvas drawing tool registered successfully!');
     console.log('Virtual Screens: Management tool registered successfully!');
+    console.log('Window Manager: Management tool registered successfully!');
 }
 
 export function deactivate() {}

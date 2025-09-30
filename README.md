@@ -2,7 +2,8 @@
 
 Give Copilot visual canvases and multiple screens to draw, display, and collaborate! 🎨🖥️
 
-<img width="1966" height="803" alt="Screenshot from 2025-09-28 18-35-41" src="https://github.com/user-attachments/assets/7128ee5a-f45c-481e-ab9a-5e65005ec3d5" />
+<img width="2495" height="1023" alt="Screenshot from 2025-09-30 07-34-11" src="https://github.com/user-attachments/assets/4722a273-2e31-492f-8831-cb72e8da63e8" />
+
 
 ## Overview
 

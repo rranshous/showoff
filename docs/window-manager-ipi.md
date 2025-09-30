@@ -33,11 +33,25 @@ This is experimental, exploratory work. Keep it simple.
 - Tool handles window positioning, WCA deployment, and communication ✅
 - Model uses one tool for all window management operations ✅
 
-### Milestone 4: Window Controller Agents (WCAs)
-- Tool deploys custom JavaScript Window Controller Agents
-- Model supplies WCA JavaScript that controls window content, title, and type
-- WCA manages window behavior: (canvas, markup, html, custom rendering)
-- WCA has full control over window content updates
+**Implementation Status**: COMPLETE
+- WindowManagerInput interface with comprehensive action support
+- Language model tool registered and functional
+- Package.json configuration with detailed schema
+- Integration with existing WindowManagerProvider
+- Ready for Window Controller Agent deployment
+
+### 🔄 Milestone 4: Window Controller Agents (WCAs) - IN PROGRESS
+- Tool deploys custom JavaScript Window Controller Agents ✅ (basic)
+- Model supplies WCA JavaScript that controls window content, title, and type 🔄
+- WCA manages window behavior: (canvas, markup, html, custom rendering) 🔄
+- WCA has full control over window content updates ✅
+
+**Current Work**:
+- Fix markup rendering (plain text → proper HTML/markdown)
+- Add GSAP & PIXI.js library support for WCAs
+- Enhance WCA reading capabilities via query action
+- Fix canvas sizing/scrollbar issues
+- Improve tool descriptions for interactive content
 
 ### Milestone 5: Advanced window features
 - Model-controlled window properties (name, size, position) via layout updates

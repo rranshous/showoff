@@ -263,8 +263,15 @@ export function activate(context: vscode.ExtensionContext) {
                             const layout = windowManagerProvider.getLayout();
                             const window = layout.windows.find(w => w.id === windowId);
                             if (window) {
+                                let result = `Window ${windowId}: "${window.title}" (${window.type}) at ${window.gridPosition.row},${window.gridPosition.col}`;
+                                if (window.controllerCode) {
+                                    result += `\nWindow Controller Agent:\n${window.controllerCode}`;
+                                }
+                                if (window.content) {
+                                    result += `\nContent: ${window.content}`;
+                                }
                                 return new vscode.LanguageModelToolResult([
-                                    new vscode.LanguageModelTextPart(`Window ${windowId}: "${window.title}" (${window.type}) at ${window.gridPosition.row},${window.gridPosition.col}${window.controllerCode ? ' [has controller]' : ''}`)
+                                    new vscode.LanguageModelTextPart(result)
                                 ]);
                             } else {
                                 return new vscode.LanguageModelToolResult([
@@ -274,7 +281,7 @@ export function activate(context: vscode.ExtensionContext) {
                         } else {
                             const layout = windowManagerProvider.getLayout();
                             const windowList = layout.windows.map(w => 
-                                `${w.id}: "${w.title}" (${w.type}) at ${w.gridPosition.row},${w.gridPosition.col}`
+                                `${w.id}: "${w.title}" (${w.type}) at ${w.gridPosition.row},${w.gridPosition.col}${w.controllerCode ? ' [WCA]' : ''}`
                             ).join(', ');
                             return new vscode.LanguageModelToolResult([
                                 new vscode.LanguageModelTextPart(`Current layout: ${layout.gridColumns}x${layout.gridRows} grid. Windows: ${windowList || 'None'}`)

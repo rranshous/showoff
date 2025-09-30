@@ -164,7 +164,7 @@
             },
             "content": {
               "type": "string",
-              "description": "Static content for the window (markup/html types). For dynamic content, use controllerCode instead."
+              "description": "Static content for the window (markup/html types). For dynamic content, use controllerCode instead. HTML with JS events requires custom type."
             },
             "layoutConfig": {
               "type": "object",

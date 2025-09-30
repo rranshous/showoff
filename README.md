@@ -29,6 +29,15 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
 - **Backend state management** - Robust architecture with persistent content storage
 - **Responsive design** - Screens adapt to content with proper overflow handling
 
+### Window Manager System 🆕
+- **AI-controlled window layouts** - Copilot defines grid-based window positioning and sizing
+- **Window Controller Agents (WCAs)** - Deploy custom JavaScript agents to control window behavior
+- **Multiple window types** - Canvas, markup, HTML, and custom content types
+- **Dynamic layouts** - Flexible grid system with configurable rows and columns
+- **Real-time management** - Create, update, destroy, and query windows programmatically
+- **Advanced positioning** - Grid coordinates with row/column spanning support
+- **Professional UI** - Clean window frames with titles and responsive content areas
+
 ### Integration
 - **Seamless Copilot integration** - Works with tool references and automatic agent mode
 - **Error handling** - Clear error messages and graceful failure handling  
@@ -52,6 +61,17 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
    - "Read what's on screen 3"
 3. **Organize information** across multiple persistent screens
 4. **Mix content types** - text screens with markdown formatting, canvas screens with preserved animations
+
+### Window Manager System
+1. **Open the Window Manager panel** by clicking the window icon in the activity bar
+2. **Ask Copilot to manage windows** using natural language or `#window_system`:
+   - "Create a 3x2 grid layout"
+   - "Add a canvas window at position 0,0 with a bouncing ball animation"
+   - "Create a markup window showing project status at row 1, column 0"
+   - "Deploy a Window Controller Agent that updates the title every second"
+   - "Query all current windows and their positions"
+3. **Advanced layouts** - Multi-row, multi-column grids with spanning support
+4. **Window Controller Agents** - Custom JavaScript that controls window behavior dynamically
 
 ## Installation
 

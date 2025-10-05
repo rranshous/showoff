@@ -36,7 +36,15 @@ jobs:
       
     - name: Update version for manual dispatch
       if: github.event_name == 'workflow_dispatch'
-      run: npm version ${{ github.event.inputs.version }} --no-git-tag-version
+      run: |
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        TARGET_VERSION="${{ github.event.inputs.version }}"
+        if [ "$CURRENT_VERSION" != "$TARGET_VERSION" ]; then
+          npm version $TARGET_VERSION --no-git-tag-version
+          echo "Updated version from $CURRENT_VERSION to $TARGET_VERSION"
+        else
+          echo "Version already set to $TARGET_VERSION, skipping update"
+        fi
       
     - name: Package extension
       run: vsce package

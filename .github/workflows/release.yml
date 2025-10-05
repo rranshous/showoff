@@ -11,6 +11,9 @@ on:
         required: true
         default: '1.0.0'
 
+permissions:
+  contents: write
+  
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -59,49 +62,43 @@ jobs:
         echo "vsix_file=${PACKAGE_NAME}-${PACKAGE_VERSION}.vsix" >> $GITHUB_OUTPUT
         
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', steps.package.outputs.version) || github.ref_name }}
-        release_name: ShowOff Extension v${{ steps.package.outputs.version }}
-        body: |
-          ## ShowOff - Visual Copilot Workspace v${{ steps.package.outputs.version }}
-          
-          Give Copilot visual canvases, virtual screens, and AI-controlled window management! 🎨🖥️
-          
-          ### Features
-          - **Canvas Drawing**: Full-screen canvas with GSAP animations and PIXI.js support
-          - **Virtual Screens**: Multiple persistent screens with markdown and canvas types
-          - **Window Manager**: AI-controlled layouts with Window Controller Agents (WCAs)
-          
-          ### Installation
-          1. Download the `${{ steps.package.outputs.vsix_file }}` file below
-          2. Open VS Code
-          3. Run command: `Extensions: Install from VSIX...`
-          4. Select the downloaded file
-          5. Reload VS Code
-          6. Look for ShowOff icons in the activity bar!
-          
-          ### Tools Available
-          - `#draw_canvas` - Draw on full-screen canvas
-          - `#virtual_screens` - Manage multiple screens
-          - `#window_system` - Control window layouts and deploy WCAs
-          
-          Enjoy experimenting with visual AI collaboration! 🚀
-        draft: false
-        prerelease: false
+      run: |
+        TAG_NAME=${{ github.event_name == 'workflow_dispatch' && format('v{0}', steps.package.outputs.version) || github.ref_name }}
         
-    - name: Upload VSIX to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ steps.package.outputs.vsix_file }}
-        asset_name: ${{ steps.package.outputs.vsix_file }}
-        asset_content_type: application/zip
+        # Create release body
+        cat > release_body.md << 'EOF'
+        ## ShowOff - Visual Copilot Workspace v${{ steps.package.outputs.version }}
+        
+        Give Copilot visual canvases, virtual screens, and AI-controlled window management! 🎨🖥️
+        
+        ### Features
+        - **Canvas Drawing**: Full-screen canvas with GSAP animations and PIXI.js support
+        - **Virtual Screens**: Multiple persistent screens with markdown and canvas types
+        - **Window Manager**: AI-controlled layouts with Window Controller Agents (WCAs)
+        
+        ### Installation
+        1. Download the `${{ steps.package.outputs.vsix_file }}` file below
+        2. Open VS Code
+        3. Run command: `Extensions: Install from VSIX...`
+        4. Select the downloaded file
+        5. Reload VS Code
+        6. Look for ShowOff icons in the activity bar!
+        
+        ### Tools Available
+        - `#draw_canvas` - Draw on full-screen canvas
+        - `#virtual_screens` - Manage multiple screens
+        - `#window_system` - Control window layouts and deploy WCAs
+        
+        Enjoy experimenting with visual AI collaboration! 🚀
+        EOF
+        
+        # Create release with gh CLI
+        gh release create "$TAG_NAME" \
+          --title "ShowOff Extension v${{ steps.package.outputs.version }}" \
+          --notes-file release_body.md \
+          "${{ steps.package.outputs.vsix_file }}"
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4

@@ -1,12 +1,35 @@
 {
   "name": "showoff",
-  "displayName": "ShowOff - Visual Copilot Canvas",
-  "description": "Gives Copilot a visual canvas to draw and collaborate",
-  "version": "0.0.1",
+  "displayName": "ShowOff - Visual Copilot Workspace",
+  "description": "Give Copilot visual canvases, virtual screens, and AI-controlled window management for enhanced collaboration",
+  "version": "1.0.0",
+  "publisher": "rranshous",
   "engines": {
     "vscode": "^1.90.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other",
+    "Visualization",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "copilot",
+    "ai",
+    "canvas",
+    "drawing",
+    "visualization",
+    "window-manager",
+    "screens"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rranshous/showoff.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rranshous/showoff/issues"
+  },
+  "homepage": "https://github.com/rranshous/showoff#readme",
+  "license": "MIT",
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
@@ -78,7 +101,9 @@
               "description": "JavaScript code to execute in the canvas context. Provide ONLY the function body code, NOT a named function declaration. Available: HTML5 Canvas API (ctx, canvas), GSAP animation library with plugins (gsap, MotionPathPlugin, Draggable), and PIXI.js renderer (PIXI - NOTE: WebGL not supported in VS Code browser, use Canvas fallback). ALWAYS USE GSAP FOR ANIMATIONS - avoid manual requestAnimationFrame loops. For complex motion: use MotionPathPlugin. For user interaction: use Draggable. Recommended pattern: GSAP animates properties, onUpdate renders to canvas/PIXI. Examples: Canvas Animation: 'gsap.to(ball, {x:200, duration:2, onUpdate:()=>{ctx.clearRect(0,0,canvas.width,canvas.height); ctx.arc(ball.x,ball.y,20,0,Math.PI*2); ctx.fill();}});' | Motion Path: 'gsap.to(obj, {motionPath: {path: \"M10,10 Q100,50 200,10\"}, onUpdate: render});' | Draggable: 'Draggable.create(element, {onDrag: updateCanvas});' | PIXI Canvas: 'const app=new PIXI.Application({view:canvas, forceCanvas:true}); gsap.to(sprite, {x:100, onUpdate:()=>app.render()});'"
             }
           },
-          "required": ["jsFunction"]
+          "required": [
+            "jsFunction"
+          ]
         }
       },
       {
@@ -94,7 +119,13 @@
           "properties": {
             "action": {
               "type": "string",
-              "enum": ["create", "update", "clear", "read", "list"],
+              "enum": [
+                "create",
+                "update",
+                "clear",
+                "read",
+                "list"
+              ],
               "description": "Action to perform: 'create' to make a new screen, 'update' to modify existing screen content, 'clear' to remove a screen, 'read' to get current screen content, 'list' to get details of all current screens"
             },
             "screenId": {
@@ -103,7 +134,10 @@
             },
             "screenType": {
               "type": "string",
-              "enum": ["text", "canvas"],
+              "enum": [
+                "text",
+                "canvas"
+              ],
               "description": "Type of screen: 'text' for text content or 'canvas' for drawing. Required when creating new screens."
             },
             "content": {
@@ -115,7 +149,9 @@
               "description": "Optional title for the screen when creating new screens. If not provided, defaults to 'Screen #X'"
             }
           },
-          "required": ["action"]
+          "required": [
+            "action"
+          ]
         }
       },
       {
@@ -131,7 +167,14 @@
           "properties": {
             "action": {
               "type": "string",
-              "enum": ["create", "update", "destroy", "layout", "query", "communicate"],
+              "enum": [
+                "create",
+                "update",
+                "destroy",
+                "layout",
+                "query",
+                "communicate"
+              ],
               "description": "Action to perform: 'layout' to set grid dimensions, 'create' to make new window, 'update' to modify existing window, 'destroy' to remove window, 'query' to get window/layout info, 'communicate' for future WCA interaction"
             },
             "windowId": {
@@ -144,18 +187,38 @@
             },
             "windowType": {
               "type": "string",
-              "enum": ["canvas", "markup", "html", "custom"],
+              "enum": [
+                "canvas",
+                "markup",
+                "html",
+                "custom"
+              ],
               "description": "Window content type: 'canvas' for HTML5 canvas with drawing, 'markup' for text/markdown content, 'html' for custom HTML, 'custom' for controller-managed content. Required for create action."
             },
             "gridPosition": {
               "type": "object",
               "properties": {
-                "row": {"type": "number", "description": "Grid row position (0-based)"},
-                "col": {"type": "number", "description": "Grid column position (0-based)"},
-                "rowSpan": {"type": "number", "description": "Number of rows to span (default 1)"},
-                "colSpan": {"type": "number", "description": "Number of columns to span (default 1)"}
+                "row": {
+                  "type": "number",
+                  "description": "Grid row position (0-based)"
+                },
+                "col": {
+                  "type": "number",
+                  "description": "Grid column position (0-based)"
+                },
+                "rowSpan": {
+                  "type": "number",
+                  "description": "Number of rows to span (default 1)"
+                },
+                "colSpan": {
+                  "type": "number",
+                  "description": "Number of columns to span (default 1)"
+                }
               },
-              "required": ["row", "col"],
+              "required": [
+                "row",
+                "col"
+              ],
               "description": "Window position and size in grid coordinates. Required for create action."
             },
             "controllerCode": {
@@ -169,17 +232,28 @@
             "layoutConfig": {
               "type": "object",
               "properties": {
-                "gridColumns": {"type": "number", "description": "Number of columns in the grid"},
-                "gridRows": {"type": "number", "description": "Number of rows in the grid"}
+                "gridColumns": {
+                  "type": "number",
+                  "description": "Number of columns in the grid"
+                },
+                "gridRows": {
+                  "type": "number",
+                  "description": "Number of rows in the grid"
+                }
               },
-              "required": ["gridColumns", "gridRows"],
+              "required": [
+                "gridColumns",
+                "gridRows"
+              ],
               "description": "Grid layout configuration. Required for layout action."
             },
             "communicationData": {
               "description": "Data for future WCA communication features"
             }
           },
-          "required": ["action"]
+          "required": [
+            "action"
+          ]
         }
       }
     ]
@@ -187,11 +261,14 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
-    "@types/vscode": "^1.90.0",
     "@types/node": "16.x",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^2.19.0",
     "typescript": "^4.9.4"
   }
 }

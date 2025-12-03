@@ -145,8 +145,31 @@
                 case 'executeJS':
                     executeJavaScript(message.jsFunction);
                     break;
+                case 'captureScreenshot':
+                    captureScreenshot();
+                    break;
             }
         });
+
+        // Function to capture canvas as screenshot and send back to extension
+        function captureScreenshot() {
+            console.log('Capturing canvas screenshot...');
+            try {
+                const canvas = document.getElementById('drawingCanvas');
+                if (canvas) {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    console.log('Screenshot captured, sending to extension');
+                    if (typeof acquireVsCodeApi !== 'undefined') {
+                        const vscode = acquireVsCodeApi();
+                        vscode.postMessage({ command: 'screenshotCaptured', dataUrl: dataUrl });
+                    }
+                } else {
+                    console.error('Canvas element not found for screenshot');
+                }
+            } catch (error) {
+                console.error('Error capturing screenshot:', error);
+            }
+        }
 
         // Function to safely execute JavaScript on the canvas
         function executeJavaScript(jsFunction) {

@@ -405,6 +405,11 @@ EXAMPLES:
 
                 // Get current canvas JS if available
                 const currentJS = canvasProvider.getLastExecutedJS();
+                
+                // Capture screenshot of current canvas
+                const screenshotData = await canvasProvider.captureScreenshot();
+                console.log('ShowOff: Screenshot captured:', screenshotData ? `${screenshotData.length} bytes` : 'null');
+                
                 let userPrompt = options.input.description;
                 
                 if (currentJS) {
@@ -422,8 +427,18 @@ Generate complete replacement JavaScript that fulfills the request while preserv
 Generate JavaScript for this canvas visualization.`;
                 }
 
+                // Build message content with optional screenshot
+                const messageContent: (vscode.LanguageModelTextPart | vscode.LanguageModelDataPart)[] = [];
+                
+                if (screenshotData) {
+                    messageContent.push(vscode.LanguageModelDataPart.image(screenshotData, 'image/png'));
+                    messageContent.push(new vscode.LanguageModelTextPart(systemPrompt + '\n\nA screenshot of the current canvas is attached above.\n\n' + userPrompt));
+                } else {
+                    messageContent.push(new vscode.LanguageModelTextPart(systemPrompt + '\n\n' + userPrompt));
+                }
+
                 const messages = [
-                    vscode.LanguageModelChatMessage.User(systemPrompt + '\n\n' + userPrompt)
+                    vscode.LanguageModelChatMessage.User(messageContent)
                 ];
                 
                 // Send request to the model

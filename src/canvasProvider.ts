@@ -8,6 +8,7 @@ export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
 
     private _view?: vscode.WebviewView;
     private _lastExecutedJS: string | null = null;
+    private _screenshotResolver: ((data: string | null) => void) | null = null;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
@@ -27,6 +28,43 @@ export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
 
     public getLastExecutedJS(): string | null {
         return this._lastExecutedJS;
+    }
+
+    public async captureScreenshot(): Promise<Uint8Array | null> {
+        if (!this._view) {
+            console.error('ShowOff: Cannot capture screenshot - webview not available');
+            return null;
+        }
+
+        return new Promise((resolve) => {
+            // Set up resolver for when webview responds
+            this._screenshotResolver = (dataUrl: string | null) => {
+                if (dataUrl) {
+                    // Convert base64 data URL to Uint8Array
+                    const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+                    const binaryString = atob(base64Data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    resolve(bytes);
+                } else {
+                    resolve(null);
+                }
+                this._screenshotResolver = null;
+            };
+
+            // Request screenshot from webview
+            this._view!.webview.postMessage({ command: 'captureScreenshot' });
+
+            // Timeout after 5 seconds
+            setTimeout(() => {
+                if (this._screenshotResolver) {
+                    console.error('ShowOff: Screenshot capture timed out');
+                    this._screenshotResolver(null);
+                }
+            }, 5000);
+        });
     }
 
     public resolveWebviewView(
@@ -53,6 +91,12 @@ export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
                 switch (message.command) {
                     case 'webview-ready':
                         console.log('ShowOff webview is ready!');
+                        return;
+                    case 'screenshotCaptured':
+                        console.log('ShowOff: Screenshot captured');
+                        if (this._screenshotResolver) {
+                            this._screenshotResolver(message.dataUrl);
+                        }
                         return;
                 }
             },

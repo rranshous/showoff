@@ -21,6 +21,12 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
 - **Real-time drawing** - Copilot executes JavaScript directly on the canvas
 - **Persistent canvas** - Drawings remain visible as you continue your conversation
 
+### Natural Language Canvas Updates 🆕
+- **Describe changes in plain English** - No need to write JavaScript yourself
+- **Visual feedback loop** - Model sees screenshot of current canvas state
+- **Context-aware updates** - Model knows current canvas code for accurate modifications
+- **Reduced context usage** - JS generation happens internally, saving your Copilot session context
+
 ### Virtual Screens  
 - **Multiple screen types** - Text screens for content, Canvas screens for drawings
 - **Markdown support** - Rich text formatting with headers, bold, italic, code blocks, lists, and links
@@ -53,6 +59,17 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
    - "Create a bar chart showing sales data"
    - "Visualize a binary tree"
 
+### Natural Language Canvas Updates
+1. **Use `#describe_canvas_update`** or ask Copilot to describe canvas changes:
+   - "Make the circle blue and add a pulsing animation"
+   - "Add a title above the chart"
+   - "Change the tree to display different data"
+2. **Benefits**: 
+   - Model generates JS internally using Claude Sonnet 4.5
+   - Sees current canvas screenshot for visual context
+   - Preserves existing elements when making updates
+   - Uses less of your Copilot session context
+
 ### Virtual Screens
 1. **Open the Virtual Screens panel** by clicking the desktop icon in the activity bar
 2. **Ask Copilot to manage screens** using natural language or `#virtual_screens`:
@@ -84,8 +101,9 @@ ShowOff is a VS Code extension that provides Copilot with both a dedicated visua
 
 ## Technical Details
 
-- **Language Model Tool**: Registered as `draw_canvas` tool for Copilot integration
-- **Canvas API**: Full HTML5 Canvas support with `ctx` and `canvas` objects
+- **Language Model Tools**: `draw_canvas`, `describe_canvas_update`, `manage_virtual_screens`, `manage_window_system`
+- **Canvas API**: Full HTML5 Canvas support with `ctx` and `canvas` objects, GSAP animations, PIXI.js
+- **Internal LM Calls**: `describe_canvas_update` uses Claude Sonnet 4.5 for JS generation with screenshot context
 - **Security**: Content Security Policy allows safe JavaScript execution
 - **Responsive**: Canvas automatically resizes to match panel dimensions
 

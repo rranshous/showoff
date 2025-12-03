@@ -380,9 +380,15 @@ export function activate(context: vscode.ExtensionContext) {
                 const model = models[0];
                 console.log(`ShowOff: Using model: ${model.id} (${model.vendor}/${model.family})`);
                 
-                // Create a simple message with the description
+                // Create messages with context about the canvas environment
+                const systemPrompt = `You are a helpful assistant that generates JavaScript code for an HTML5 canvas. 
+When given a description, respond with ONLY the JavaScript code - no explanations, no markdown code blocks, just the raw JavaScript.
+The code will be executed in a context where 'ctx' is the 2D canvas context and 'canvas' is the canvas element.
+Keep responses concise and focused on the drawing task.`;
+
                 const messages = [
-                    vscode.LanguageModelChatMessage.User(`Canvas update request: ${options.input.description}`)
+                    vscode.LanguageModelChatMessage.User(systemPrompt),
+                    vscode.LanguageModelChatMessage.User(`Generate canvas JavaScript for: ${options.input.description}`)
                 ];
                 
                 // Send request to the model

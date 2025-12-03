@@ -326,9 +326,78 @@ export function activate(context: vscode.ExtensionContext) {
             console.log('ShowOff: Description:', options.input.description);
             
             try {
-                // Milestone 1: No-op implementation - just acknowledge receipt
+                // Debug: List all available models
+                const allModels = await vscode.lm.selectChatModels();
+                console.log('ShowOff: Available models:');
+                for (const m of allModels) {
+                    console.log(`  - id: ${m.id}, vendor: ${m.vendor}, family: ${m.family}, name: ${m.name}`);
+                }
+                
+                // Filter for Claude models
+                const claudeModels = allModels.filter(m => 
+                    m.id.toLowerCase().includes('claude') || 
+                    m.family.toLowerCase().includes('claude') ||
+                    m.name.toLowerCase().includes('claude')
+                );
+                console.log('ShowOff: Claude models found:', claudeModels.map(m => m.id));
+                
+                // Try exact match for claude-sonnet-4.5 first
+                let models = allModels.filter(m => m.id === 'claude-sonnet-4.5');
+                
+                if (models.length === 0) {
+                    // Fall back to highest numbered claude-sonnet model
+                    const claudeSonnetModels = allModels.filter(m => 
+                        m.id.toLowerCase().startsWith('claude-sonnet-')
+                    );
+                    if (claudeSonnetModels.length > 0) {
+                        // Sort by version number (extract number after 'claude-sonnet-')
+                        claudeSonnetModels.sort((a, b) => {
+                            const versionA = parseFloat(a.id.replace('claude-sonnet-', '')) || 0;
+                            const versionB = parseFloat(b.id.replace('claude-sonnet-', '')) || 0;
+                            return versionB - versionA; // Descending order
+                        });
+                        console.log('ShowOff: claude-sonnet-4.5 not found, using highest version:', claudeSonnetModels[0].id);
+                        models = [claudeSonnetModels[0]];
+                    }
+                }
+                
+                if (models.length === 0 && claudeModels.length > 0) {
+                    console.log('ShowOff: No claude-sonnet models, using first available Claude model');
+                    models = [claudeModels[0]];
+                }
+                
+                if (models.length === 0) {
+                    console.log('ShowOff: No Claude models found, using any available model');
+                    models = allModels;
+                }
+                
+                if (models.length === 0) {
+                    return new vscode.LanguageModelToolResult([
+                        new vscode.LanguageModelTextPart('Error: No language models available. Please ensure you have access to GitHub Copilot or another LM provider.')
+                    ]);
+                }
+                
+                const model = models[0];
+                console.log(`ShowOff: Using model: ${model.id} (${model.vendor}/${model.family})`);
+                
+                // Create a simple message with the description
+                const messages = [
+                    vscode.LanguageModelChatMessage.User(`Canvas update request: ${options.input.description}`)
+                ];
+                
+                // Send request to the model
+                const response = await model.sendRequest(messages, {}, token);
+                
+                // Collect the response
+                let responseText = '';
+                for await (const chunk of response.text) {
+                    responseText += chunk;
+                }
+                
+                console.log('ShowOff: Model response:', responseText);
+                
                 return new vscode.LanguageModelToolResult([
-                    new vscode.LanguageModelTextPart(`Successfully received canvas update description: "${options.input.description}". (No-op implementation - canvas update not yet performed.)`)
+                    new vscode.LanguageModelTextPart(`Model (${model.family}) responded: ${responseText}`)
                 ]);
             } catch (error) {
                 console.error('ShowOff: Error in describe canvas update:', error);

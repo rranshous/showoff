@@ -37,3 +37,13 @@ Capture the current JavaScript code from the canvas and include it in the model 
 Capture a screenshot of the rendered canvas from the webview and include it as an image in the model prompt. This provides visual context to the model about what's currently displayed.
 
 **Expected Outcome**: Model receives both the current JS and a visual screenshot, enabling more accurate updates based on what's actually rendered.
+
+---
+
+## Stretch Goals
+
+### Stretch A: Include Canvas Dimensions in Context
+
+Query the current canvas size from the webview and include the actual width/height values in the model prompt. This allows the model to generate code with accurate positioning rather than relying on canvas.width/height at runtime.
+
+**Expected Outcome**: Model knows exact canvas dimensions (e.g., "Canvas is 400x300 pixels") and can position elements precisely.

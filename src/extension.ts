@@ -380,15 +380,32 @@ export function activate(context: vscode.ExtensionContext) {
                 const model = models[0];
                 console.log(`ShowOff: Using model: ${model.id} (${model.vendor}/${model.family})`);
                 
-                // Create messages with context about the canvas environment
-                const systemPrompt = `You are a helpful assistant that generates JavaScript code for an HTML5 canvas. 
-When given a description, respond with ONLY the JavaScript code - no explanations, no markdown code blocks, just the raw JavaScript.
-The code will be executed in a context where 'ctx' is the 2D canvas context and 'canvas' is the canvas element.
-Keep responses concise and focused on the drawing task.`;
+                // Detailed prompt with canvas environment info (matching draw_canvas tool description)
+                const systemPrompt = `You are a JavaScript code generator for an HTML5 canvas visualization system.
+
+ENVIRONMENT:
+- ctx: 2D canvas rendering context
+- canvas: The canvas element (access .width and .height for dimensions)
+- gsap: GSAP animation library (prefer this over requestAnimationFrame)
+- PIXI: PIXI.js renderer (use forceCanvas:true - WebGL not supported)
+- MotionPathPlugin: GSAP plugin for path animations
+- Draggable: GSAP plugin for drag interactions
+
+RULES:
+1. Output ONLY raw JavaScript code - no markdown, no code blocks, no explanations
+2. Provide function body code only, NOT a function declaration
+3. ALWAYS use GSAP for animations - avoid manual requestAnimationFrame loops
+4. For complex motion, use MotionPathPlugin
+5. For user interaction, use Draggable
+
+EXAMPLES:
+- Simple shape: ctx.fillStyle = "red"; ctx.beginPath(); ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2); ctx.fill();
+- Animation: const ball = {x: 50, y: 50}; gsap.to(ball, {x: 200, duration: 2, onUpdate: () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.beginPath(); ctx.arc(ball.x, ball.y, 20, 0, Math.PI*2); ctx.fill(); }});
+
+Generate canvas JavaScript for the following request:`;
 
                 const messages = [
-                    vscode.LanguageModelChatMessage.User(systemPrompt),
-                    vscode.LanguageModelChatMessage.User(`Generate canvas JavaScript for: ${options.input.description}`)
+                    vscode.LanguageModelChatMessage.User(systemPrompt + '\n\n' + options.input.description)
                 ];
                 
                 // Send request to the model
@@ -402,8 +419,21 @@ Keep responses concise and focused on the drawing task.`;
                 
                 console.log('ShowOff: Model response:', responseText);
                 
+                // Clean up the response - remove markdown code blocks if present
+                let jsCode = responseText.trim();
+                
+                // Remove ```javascript or ```js code blocks if the model included them despite instructions
+                if (jsCode.startsWith('```')) {
+                    jsCode = jsCode.replace(/^```(?:javascript|js)?\n?/, '').replace(/\n?```$/, '');
+                }
+                
+                console.log('ShowOff: Executing JS on canvas:', jsCode);
+                
+                // Execute the JavaScript on the canvas
+                canvasProvider.executeJavaScript(jsCode);
+                
                 return new vscode.LanguageModelToolResult([
-                    new vscode.LanguageModelTextPart(`Model (${model.family}) responded: ${responseText}`)
+                    new vscode.LanguageModelTextPart(`Canvas updated successfully. Generated and executed JavaScript based on: "${options.input.description}"`)
                 ]);
             } catch (error) {
                 console.error('ShowOff: Error in describe canvas update:', error);

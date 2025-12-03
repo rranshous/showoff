@@ -1,0 +1,9 @@
+# Implementation Progress: Describe Canvas Update Tool
+
+## Milestones
+
+- [ ] Milestone 1: Register No-Op Tool
+- [ ] Milestone 2: Call Language Model
+- [ ] Milestone 3: Generate and Render Canvas JS
+- [ ] Milestone 4: Include Current JS in Context
+- [ ] Milestone 5: Include Screenshot in Context

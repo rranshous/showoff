@@ -397,15 +397,33 @@ RULES:
 3. ALWAYS use GSAP for animations - avoid manual requestAnimationFrame loops
 4. For complex motion, use MotionPathPlugin
 5. For user interaction, use Draggable
+6. When updating existing canvas, incorporate relevant elements from the current code
 
 EXAMPLES:
 - Simple shape: ctx.fillStyle = "red"; ctx.beginPath(); ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI*2); ctx.fill();
-- Animation: const ball = {x: 50, y: 50}; gsap.to(ball, {x: 200, duration: 2, onUpdate: () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.beginPath(); ctx.arc(ball.x, ball.y, 20, 0, Math.PI*2); ctx.fill(); }});
+- Animation: const ball = {x: 50, y: 50}; gsap.to(ball, {x: 200, duration: 2, onUpdate: () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.beginPath(); ctx.arc(ball.x, ball.y, 20, 0, Math.PI*2); ctx.fill(); }});`;
 
-Generate canvas JavaScript for the following request:`;
+                // Get current canvas JS if available
+                const currentJS = canvasProvider.getLastExecutedJS();
+                let userPrompt = options.input.description;
+                
+                if (currentJS) {
+                    userPrompt = `CURRENT CANVAS CODE:
+\`\`\`javascript
+${currentJS}
+\`\`\`
+
+REQUEST: ${options.input.description}
+
+Generate complete replacement JavaScript that fulfills the request while preserving relevant elements from the current code.`;
+                } else {
+                    userPrompt = `REQUEST: ${options.input.description}
+
+Generate JavaScript for this canvas visualization.`;
+                }
 
                 const messages = [
-                    vscode.LanguageModelChatMessage.User(systemPrompt + '\n\n' + options.input.description)
+                    vscode.LanguageModelChatMessage.User(systemPrompt + '\n\n' + userPrompt)
                 ];
                 
                 // Send request to the model

@@ -7,6 +7,7 @@ export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'showoff.canvasView';
 
     private _view?: vscode.WebviewView;
+    private _lastExecutedJS: string | null = null;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
@@ -14,6 +15,7 @@ export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
 
     public executeJavaScript(jsFunction: string): void {
         if (this._view) {
+            this._lastExecutedJS = jsFunction;
             this._view.webview.postMessage({
                 command: 'executeJS',
                 jsFunction: jsFunction
@@ -21,6 +23,10 @@ export class ShowOffCanvasProvider implements vscode.WebviewViewProvider {
         } else {
             console.error('ShowOff: Cannot execute JavaScript - webview not available');
         }
+    }
+
+    public getLastExecutedJS(): string | null {
+        return this._lastExecutedJS;
     }
 
     public resolveWebviewView(

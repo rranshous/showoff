@@ -79,13 +79,24 @@
                 return;
             }
             
-            // Function to resize canvas to match display size
+            // Function to resize canvas to match display size (HiDPI aware)
             function resizeCanvas() {
                 const rect = canvas.getBoundingClientRect();
-                canvas.width = rect.width;
-                canvas.height = rect.height;
+                const dpr = window.devicePixelRatio || 1;
                 
-                console.log(`Canvas resized to ${canvas.width}x${canvas.height}`);
+                // Set bitmap size to physical pixels for crisp rendering
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                
+                // CSS size stays at logical pixels
+                canvas.style.width = rect.width + 'px';
+                canvas.style.height = rect.height + 'px';
+                
+                // Scale context so drawing commands use CSS pixels
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                
+                console.log(`Canvas resized to ${canvas.width}x${canvas.height} (DPR: ${dpr})`);
                 
                 // Re-execute stored JavaScript if we have content, otherwise show placeholder
                 if (hasContent && lastExecutedJS) {

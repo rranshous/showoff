@@ -254,22 +254,33 @@
                             </div>
                         `;
                         
-                        // Execute canvas content with responsive sizing
+                        // Execute canvas content with responsive sizing (HiDPI aware)
                         setTimeout(() => {
                             const canvas = document.getElementById(`screen-${screen.id}-canvas`);
                             if (canvas) {
-                                // Set canvas size to match container
+                                // Set canvas size to match container with DPR scaling
                                 const container = canvas.parentElement;
                                 const rect = container.getBoundingClientRect();
-                                canvas.width = Math.max(200, rect.width - 10); // Min 200px width
-                                canvas.height = Math.max(150, rect.height - 10); // Min 150px height
+                                const dpr = window.devicePixelRatio || 1;
+                                const cssWidth = Math.max(200, rect.width - 10); // Min 200px width
+                                const cssHeight = Math.max(150, rect.height - 10); // Min 150px height
+                                
+                                // Set bitmap size to physical pixels
+                                canvas.width = cssWidth * dpr;
+                                canvas.height = cssHeight * dpr;
+                                
+                                // CSS size stays at logical pixels
+                                canvas.style.width = cssWidth + 'px';
+                                canvas.style.height = cssHeight + 'px';
                                 
                                 if (screen.content) {
                                     const ctx = canvas.getContext('2d');
+                                    // Scale context so drawing commands use CSS pixels
+                                    ctx.scale(dpr, dpr);
                                     try {
-                                        // Clear with light background
+                                        // Clear with light background (use CSS dimensions)
                                         ctx.fillStyle = '#f8f8f8';
-                                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                        ctx.fillRect(0, 0, cssWidth, cssHeight);
                                         
                                         // Execute the JavaScript function
                                         const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', 'MotionPathPlugin', 'Draggable', screen.content);
@@ -277,7 +288,7 @@
                                     } catch (error) {
                                         console.error(`Error rendering canvas screen ${screen.id}:`, error);
                                         ctx.fillStyle = '#f8f8f8';
-                                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                        ctx.fillRect(0, 0, cssWidth, cssHeight);
                                         ctx.fillStyle = '#ff4444';
                                         ctx.font = '12px Arial';
                                         ctx.textAlign = 'left';
@@ -287,8 +298,9 @@
                                 } else {
                                     // Empty canvas with light background
                                     const ctx = canvas.getContext('2d');
+                                    ctx.scale(dpr, dpr);
                                     ctx.fillStyle = '#f8f8f8';
-                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    ctx.fillRect(0, 0, cssWidth, cssHeight);
                                 }
                             }
                         }, 10); // Small delay to ensure container is sized
@@ -338,14 +350,25 @@
                     contentElement.innerHTML = parseMarkdown(screen.content);
                 }
             } else { // canvas
-                // For canvas, we need to re-execute the drawing code
+                // For canvas, we need to re-execute the drawing code with DPR scaling
                 const canvas = screenDiv.querySelector('canvas');
                 if (canvas && screen.content) {
+                    const dpr = window.devicePixelRatio || 1;
+                    const cssWidth = canvas.clientWidth || 200;
+                    const cssHeight = canvas.clientHeight || 150;
+                    
+                    // Reset canvas size with DPR scaling
+                    canvas.width = cssWidth * dpr;
+                    canvas.height = cssHeight * dpr;
+                    canvas.style.width = cssWidth + 'px';
+                    canvas.style.height = cssHeight + 'px';
+                    
                     const ctx = canvas.getContext('2d');
+                    ctx.scale(dpr, dpr);
                     try {
-                        // Clear with light background
+                        // Clear with light background (use CSS dimensions)
                         ctx.fillStyle = '#f8f8f8';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillRect(0, 0, cssWidth, cssHeight);
                         
                         // Execute the JavaScript function
                         const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', 'MotionPathPlugin', 'Draggable', screen.content);
@@ -353,7 +376,7 @@
                     } catch (error) {
                         console.error(`Error updating canvas screen ${screen.id}:`, error);
                         ctx.fillStyle = '#f8f8f8';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillRect(0, 0, cssWidth, cssHeight);
                         ctx.fillStyle = '#ff4444';
                         ctx.font = '12px Arial';
                         ctx.textAlign = 'left';
@@ -386,26 +409,37 @@
                     </div>
                 `;
                 
-                // Setup canvas with responsive sizing
+                // Setup canvas with responsive sizing (HiDPI aware)
                 setTimeout(() => {
                     const canvas = document.getElementById(`screen-${screen.id}-canvas`);
                     if (canvas) {
                         const container = canvas.parentElement;
                         const rect = container.getBoundingClientRect();
-                        canvas.width = Math.max(200, rect.width - 10);
-                        canvas.height = Math.max(150, rect.height - 10);
+                        const dpr = window.devicePixelRatio || 1;
+                        const cssWidth = Math.max(200, rect.width - 10);
+                        const cssHeight = Math.max(150, rect.height - 10);
+                        
+                        // Set bitmap size to physical pixels
+                        canvas.width = cssWidth * dpr;
+                        canvas.height = cssHeight * dpr;
+                        
+                        // CSS size stays at logical pixels
+                        canvas.style.width = cssWidth + 'px';
+                        canvas.style.height = cssHeight + 'px';
                         
                         if (screen.content) {
                             const ctx = canvas.getContext('2d');
+                            // Scale context so drawing commands use CSS pixels
+                            ctx.scale(dpr, dpr);
                             try {
                                 ctx.fillStyle = '#f8f8f8';
-                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                ctx.fillRect(0, 0, cssWidth, cssHeight);
                                 const userFunction = new Function('ctx', 'canvas', 'gsap', 'PIXI', 'MotionPathPlugin', 'Draggable', screen.content);
                                 userFunction(ctx, canvas, window.gsap, window.PIXI, window.MotionPathPlugin, window.Draggable);
                             } catch (error) {
                                 console.error(`Error creating canvas screen ${screen.id}:`, error);
                                 ctx.fillStyle = '#f8f8f8';
-                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                ctx.fillRect(0, 0, cssWidth, cssHeight);
                                 ctx.fillStyle = '#ff4444';
                                 ctx.font = '12px Arial';
                                 ctx.textAlign = 'left';
@@ -414,8 +448,9 @@
                             }
                         } else {
                             const ctx = canvas.getContext('2d');
+                            ctx.scale(dpr, dpr);
                             ctx.fillStyle = '#f8f8f8';
-                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.fillRect(0, 0, cssWidth, cssHeight);
                         }
                     }
                 }, 10);

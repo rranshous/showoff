@@ -200,6 +200,31 @@
             
             container.appendChild(windowFrame);
             
+            // Setup canvas with HiDPI scaling if this is a canvas window
+            if (window.type === 'canvas') {
+                setTimeout(() => {
+                    const canvasElement = document.getElementById(`canvas-${window.id}`);
+                    if (canvasElement) {
+                        const dpr = window.devicePixelRatio || 1;
+                        const rect = canvasElement.getBoundingClientRect();
+                        const cssWidth = rect.width;
+                        const cssHeight = rect.height;
+                        
+                        // Set bitmap size to physical pixels
+                        canvasElement.width = cssWidth * dpr;
+                        canvasElement.height = cssHeight * dpr;
+                        
+                        // CSS size stays at logical pixels
+                        canvasElement.style.width = cssWidth + 'px';
+                        canvasElement.style.height = cssHeight + 'px';
+                        
+                        // Scale context so drawing commands use CSS pixels
+                        const ctx = canvasElement.getContext('2d');
+                        ctx.scale(dpr, dpr);
+                    }
+                }, 10);
+            }
+            
             // Execute window controller if present
             if (window.controllerCode) {
                 executeWindowController(window.id, window.controllerCode);

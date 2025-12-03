@@ -16,6 +16,10 @@ interface VirtualScreensInput {
     title?: string;
 }
 
+interface DescribeCanvasUpdateInput {
+    description: string;
+}
+
 interface WindowManagerInput {
     action: 'create' | 'update' | 'destroy' | 'layout' | 'query' | 'communicate';
     windowId?: string;
@@ -315,13 +319,41 @@ export function activate(context: vscode.ExtensionContext) {
         }
     };
 
+    // Register the describe canvas update tool for natural language canvas modifications
+    const describeCanvasUpdateTool: vscode.LanguageModelTool<DescribeCanvasUpdateInput> = {
+        invoke: async (options: vscode.LanguageModelToolInvocationOptions<DescribeCanvasUpdateInput>, token: vscode.CancellationToken) => {
+            console.log('ShowOff: Describe canvas update tool invoked!');
+            console.log('ShowOff: Description:', options.input.description);
+            
+            try {
+                // Milestone 1: No-op implementation - just acknowledge receipt
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(`Successfully received canvas update description: "${options.input.description}". (No-op implementation - canvas update not yet performed.)`)
+                ]);
+            } catch (error) {
+                console.error('ShowOff: Error in describe canvas update:', error);
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(`Error processing canvas update description: ${error}`)
+                ]);
+            }
+        },
+        
+        prepareInvocation: async (options, token) => {
+            return {
+                invocationMessage: 'Processing canvas update description...'
+            };
+        }
+    };
+
     // Register the tools with VS Code
     const canvasToolRegistration = vscode.lm.registerTool('draw_canvas', drawCanvasTool);
     const screensToolRegistration = vscode.lm.registerTool('manage_virtual_screens', virtualScreensTool);
     const windowManagerToolRegistration = vscode.lm.registerTool('manage_window_system', windowManagerTool);
-    context.subscriptions.push(canvasToolRegistration, screensToolRegistration, windowManagerToolRegistration);
+    const describeCanvasUpdateToolRegistration = vscode.lm.registerTool('describe_canvas_update', describeCanvasUpdateTool);
+    context.subscriptions.push(canvasToolRegistration, screensToolRegistration, windowManagerToolRegistration, describeCanvasUpdateToolRegistration);
     
     console.log('ShowOff: Canvas drawing tool registered successfully!');
+    console.log('ShowOff: Describe canvas update tool registered successfully!');
     console.log('Virtual Screens: Management tool registered successfully!');
     console.log('Window Manager: Management tool registered successfully!');
 }

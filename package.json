@@ -255,6 +255,27 @@
             "action"
           ]
         }
+      },
+      {
+        "name": "describe_canvas_update",
+        "displayName": "Describe Canvas Update Tool",
+        "modelDescription": "Describe desired changes to the ShowOff canvas in natural language. The extension will generate and execute the appropriate JavaScript code internally using an LM call, reducing context usage in your session. Use this when you want to update or create canvas visuals without writing JavaScript directly.",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "describe_canvas_update",
+        "icon": "$(paintcan)",
+        "userDescription": "Describe canvas changes in natural language - JS is generated internally",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Natural language description of the desired canvas update or visualization. Be specific about colors, shapes, positions, animations, or any visual elements you want. Examples: 'Draw a red circle in the center', 'Add a bouncing blue ball', 'Create a bar chart with 5 bars of varying heights', 'Make the existing circle pulse with a glow effect'."
+            }
+          },
+          "required": [
+            "description"
+          ]
+        }
       }
     ]
   },
